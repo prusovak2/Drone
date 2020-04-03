@@ -46,13 +46,18 @@ indexedByTime.to_csv('output.tsv', sep='\t')
 
 print("unique indexed by time:", indexedByTime.index.is_unique)
 
-#resampled = indexedByTime.resample('5s').interpolate()
+#ts = pd.Series(data[:,0], times)
+resampled=indexedByTime.resample('50ms').mean()
+resampled=resampled.reindex().ffill()
+resampled=resampled[indexedByTime.index[0]:indexedByTime.index[-1]]
+
+#resampled = indexedByTime.resample('5s').asfreq()
 
 #resample_index = pd.date_range(start=indexedByTime.index[0], end=indexedByTime.index[-1], freq='50ms')
 #dummy_frame = pd.DataFrame(np.NaN, index=resample_index, columns=indexedByTime.columns)
 #resampled = indexedByTime.combine_first(dummy_frame).interpolate(method='time').resample('50ms').asfreq()
 
-resampled.to_csv('output2.tsv', sep='\t')
+resampled.to_csv('resampled.tsv', sep='\t')
 
 
 
