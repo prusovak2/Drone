@@ -94,9 +94,30 @@ data.index.name = 'time'
 indexIterator = 0
 for index in data.index:
     #cmds
-    data.leftRight[index] = merged.leftRight[index]
-    data.frontBack[index] = merged.frontBack[index]
-    data.angular[index] = merged.angular[index]
+    #leftRight
+    if merged.leftRight[index] <= -0.05:
+        data.leftRight[index] = 1
+    elif merged.leftRight[index] >= 0.05:
+        data.leftRight[index] = 3
+    else:
+        data.leftRight[index] = 2
+
+    #frontBack
+    if merged.frontBack[index] <= -0.05:
+        data.frontBack[index] = 1
+    elif merged.frontBack[index] >= 0.05:
+        data.frontBack[index] = 3
+    else:
+        data.frontBack[index] = 2
+
+    #angular
+    if merged.angular[index] <= -0.05:
+        data.angular[index] = 1
+    elif merged.angular[index] >= 0.05:
+        data.angular[index] = 3
+    else:
+        data.angular[index] = 2
+
     #Roll
     data.Roll_Mean[index] = np.mean(merged.Roll_x.iloc[indexIterator:indexIterator + intervalLen])
     data.Roll_SD[index] = np.std(merged.Roll_x.iloc[indexIterator:indexIterator + intervalLen])
