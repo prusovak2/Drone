@@ -66,7 +66,7 @@ def CreateDataWithComplexValues(index, indexIterator, intervalLen, inputDF, outp
     outputDF.Yaw_FFT_SD[index] = np.std(fft)
 
 def CreateDataWithRealAndImagPart(index, indexIterator, intervalLen, inputDF, outputDF):
-
+    return
 
 def CreateDataFrame(inputDFmerged, ColumnNames, functionToCreateContend, intervalLen=40):
     intIndexed = inputDFmerged.reset_index()
@@ -91,7 +91,7 @@ resampledCmds = cmds.resample('50ms').mean()
 resampledCmds = resampledCmds.reindex().bfill()
 resampledCmds = resampledCmds[cmds.index[0]:cmds.index[-1]]
 
-resampledCmds.to_csv('resampledCmds.tsv', sep='\t')
+# resampledCmds.to_csv('resampledCmds.tsv', sep='\t')
 
 navDataColumnNames = ['time', 'State', 'Battery_level', 'Magnetometer_x', 'Magnetometer_y', 'Magnetometer_z', 'Pressure',
                       'Temperature', 'Wind_speed', 'Wind_angle', 'Wind_compensation:pitch', 'Wind_compensation:roll',
@@ -111,13 +111,13 @@ resampledNav = navData.resample('50ms').mean()
 resampledNav = resampledNav.reindex().bfill()
 resampledNav = resampledNav[cmds.index[0]:cmds.index[-1]]
 
-resampledNav.to_csv('resampledNav.tsv', sep='\t')
+# resampledNav.to_csv('resampledNav.tsv', sep='\t')
 
 # how inner - intersection, keeps only times that do have corresponding counterpart in second file
 merged = pd.merge(resampledCmds, resampledNav, right_index=True, left_index=True, how='inner') #merge when time is index
 #inputDF = pd.merge(cmds, navData, right_on="time", left_on="time", how='inner', indicator=True)
 
-merged.to_csv("mergedResampled.tsv", sep='\t')
+# merged.to_csv("mergedResampled.tsv", sep='\t')
 print("unique time right after merge:", merged.index.is_unique)
 
 #TODO: after this outputDF is indexed by senceless dates begginning with start of unix date - does it make any sence?
@@ -133,7 +133,7 @@ dataColumnNamesComplex = ['leftRight', 'frontBack', 'angular', 'Roll_Mean', 'Rol
                    'Yaw_FFT_SD']
 
 dataForDTComplex = CreateDataFrame(inputDFmerged=merged, ColumnNames=dataColumnNamesComplex, functionToCreateContend=CreateDataWithComplexValues, intervalLen=40)
-dataForDTComplex.to_csv('dataForDTComplex.tsv', sep='\t')
+dataForDTComplex.to_csv('OutputStages\\dataForDTComplex.tsv', sep='\t')
 
 dataColumnNamesRealImag = ['leftRight', 'frontBack', 'angular', 'Roll_Mean', 'Roll_SD', 'Roll_FFT_Mean_Real', 'Roll_FFT_Mean_Imag',
                            'Roll_FFT_SD','Pitch_Mean', 'Pitch_SD', 'Pitch_FFT_Mean_Real', 'Pitch_FFT_Mean_Imag', 'Pitch_FFT_SD',
