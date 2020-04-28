@@ -1,23 +1,21 @@
 import pandas as pd
 import numpy as np
-from PrepareDataDT import dataForDT
+from PrepareDataDT import dataForDTRealImag
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.tree import DecisionTreeRegressor
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import GridSearchCV
 from sklearn.preprocessing import StandardScaler
 
-#vectors = []
-#for index in outputDF.index:
-#    outputDF.Roll_FFT_Mean[index] = outputDF.Roll_FTT_Mean[index].imag
-
-#print(outputDF.Roll_FFT_Mean)
-
-#outputDF['Roll_FFT_Mean'] = vectors
-#print(outputDF['Roll_FFT_Mean'])
-
+dataForDT = dataForDTRealImag
 # split what I wanna predict from what I wanna base a prediction on
 labels = dataForDT[['leftRight', 'frontBack', 'angular']]
+#labels = dataForDT[['leftRight']]
+
+labels = labels.reset_index()
+labels = labels.drop(['time'], axis=1)
+print(labels)
 features = dataForDT.drop(['leftRight', 'frontBack', 'angular'], axis=1)
 
 # save a part of data as a test data

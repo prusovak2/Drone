@@ -20,7 +20,6 @@ def CreateEmptyDataFrame(intervalLen, intIndexedDF, dataColumnNames):
     dataForDT.index.name = 'time'
     return dataForDT
 
-
 def MakeCMDsDiscrete(index, inputDF, outputDF):
     #cmds
     #leftRight
