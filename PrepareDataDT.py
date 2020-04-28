@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 
+
 def CreateEmptyDataFrame(intervalLen, intIndexedDF, dataColumnNames):
     # create matrix to base machine learning on
     # intervalLen = 40
@@ -18,6 +19,7 @@ def CreateEmptyDataFrame(intervalLen, intIndexedDF, dataColumnNames):
     dataForDT.index = pd.to_datetime(dataForDT.index, unit='ms')
     dataForDT.index.name = 'time'
     return dataForDT
+
 
 def MakeCMDsDiscrete(index, inputDF, outputDF):
     #cmds
@@ -45,6 +47,7 @@ def MakeCMDsDiscrete(index, inputDF, outputDF):
     else:
         outputDF.angular[index] = 2
 
+
 def CreateDataWithComplexValues(index, indexIterator, intervalLen, inputDF, outputDF):
     # Roll
     outputDF.Roll_Mean[index] = np.mean(inputDF.Roll_x.iloc[indexIterator:indexIterator + intervalLen])
@@ -65,8 +68,33 @@ def CreateDataWithComplexValues(index, indexIterator, intervalLen, inputDF, outp
     outputDF.Yaw_FFT_Mean[index] = np.mean(fft)
     outputDF.Yaw_FFT_SD[index] = np.std(fft)
 
+
 def CreateDataWithRealAndImagPart(index, indexIterator, intervalLen, inputDF, outputDF):
-    return
+    # Roll
+    outputDF.Roll_Mean[index] = np.mean(inputDF.Roll_x.iloc[indexIterator:indexIterator + intervalLen])
+    outputDF.Roll_SD[index] = np.std(inputDF.Roll_x.iloc[indexIterator:indexIterator + intervalLen])
+    fft = np.fft.fft(inputDF.Roll_x.iloc[indexIterator:indexIterator + intervalLen])
+    RollFFTMean = np.mean(fft)
+    outputDF.Roll_FFT_Mean_Real[index] = RollFFTMean.real
+    outputDF.Roll_FFT_Mean_Imag[index] = RollFFTMean.imag
+    outputDF.Roll_FFT_SD[index] = np.std(fft)
+    # Pitch
+    outputDF.Pitch_Mean[index] = np.mean(inputDF.Pitch_y.iloc[indexIterator:indexIterator + intervalLen])
+    outputDF.Pitch_SD[index] = np.std(inputDF.Pitch_y.iloc[indexIterator:indexIterator + intervalLen])
+    fft = np.fft.fft(inputDF.Pitch_y.iloc[indexIterator:indexIterator + intervalLen])
+    PitchFFTMean = np.mean(fft)
+    outputDF.Pitch_FFT_Mean_Real[index] = PitchFFTMean.real
+    outputDF.Pitch_FFT_Mean_Imag[index] = PitchFFTMean.imag
+    outputDF.Pitch_FFT_SD[index] = np.std(fft)
+    # Yaw
+    outputDF.Yaw_Mean[index] = np.mean(inputDF.Yaw_z.iloc[indexIterator:indexIterator + intervalLen])
+    outputDF.Yaw_SD[index] = np.std(inputDF.Yaw_z.iloc[indexIterator:indexIterator + intervalLen])
+    fft = np.fft.fft(inputDF.Yaw_z.iloc[indexIterator:indexIterator + intervalLen])
+    YawFFTMean = np.mean(fft)
+    outputDF.Yaw_FFT_Mean_Real[index] = YawFFTMean.real
+    outputDF.Yaw_FFT_Mean_Imag[index] = YawFFTMean.imag
+    outputDF.Yaw_FFT_SD[index] = np.std(fft)
+
 
 def CreateDataFrame(inputDFmerged, ColumnNames, functionToCreateContend, intervalLen=40):
     intIndexed = inputDFmerged.reset_index()
@@ -124,21 +152,19 @@ print("unique time right after merge:", merged.index.is_unique)
 #TODO: can I somehow format string representation of values in particular columns while printing them to file by to_scv
 #TODO: to print 'time' in some meaningfull format
 
-print(merged.frontBack['2016-03-31 12:29:28.950'])
-
-# intIndexed = merged.reset_index()
-#intIndexed.to_csv('tmp.tsv', sep='\t')
+# Create DataForDTComplex
 dataColumnNamesComplex = ['leftRight', 'frontBack', 'angular', 'Roll_Mean', 'Roll_SD', 'Roll_FFT_Mean', 'Roll_FFT_SD',
                    'Pitch_Mean', 'Pitch_SD', 'Pitch_FFT_Mean', 'Pitch_FFT_SD', 'Yaw_Mean', 'Yaw_SD', 'Yaw_FFT_Mean',
                    'Yaw_FFT_SD']
-
 dataForDTComplex = CreateDataFrame(inputDFmerged=merged, ColumnNames=dataColumnNamesComplex, functionToCreateContend=CreateDataWithComplexValues, intervalLen=40)
 dataForDTComplex.to_csv('OutputStages\\dataForDTComplex.tsv', sep='\t')
 
+# Create DataForDTRealImag
 dataColumnNamesRealImag = ['leftRight', 'frontBack', 'angular', 'Roll_Mean', 'Roll_SD', 'Roll_FFT_Mean_Real', 'Roll_FFT_Mean_Imag',
                            'Roll_FFT_SD','Pitch_Mean', 'Pitch_SD', 'Pitch_FFT_Mean_Real', 'Pitch_FFT_Mean_Imag', 'Pitch_FFT_SD',
                            'Yaw_Mean', 'Yaw_SD', 'Yaw_FFT_Mean_Real', 'Yaw_FFT_Mean_Imag','Yaw_FFT_SD']
-
+dataForDTRealImag = CreateDataFrame(inputDFmerged=merged, ColumnNames=dataColumnNamesRealImag, functionToCreateContend=CreateDataWithRealAndImagPart, intervalLen=40)
+dataForDTRealImag.to_csv('OutputStages\\dataForDTRealImag.tsv', sep='\t')
 
 
 
