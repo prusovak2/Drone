@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
-from PrepareDataDT import dataForDTRealImag
+from PrepareDataDT import dataForDTRealImagFrozenDict
+from PrepareDataDT import Cmd
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.tree import DecisionTreeRegressor
@@ -8,14 +9,16 @@ from sklearn.pipeline import Pipeline
 from sklearn.model_selection import GridSearchCV
 from sklearn.preprocessing import StandardScaler
 
-dataForDT = dataForDTRealImag
+dataForDTRealImagFrozenDict.describe()
+dataForDT = dataForDTRealImagFrozenDict
+
 # split what I wanna predict from what I wanna base a prediction on
-labels = dataForDT[['leftRight', 'frontBack', 'angular']]
-#labels = dataForDT[['leftRight']]
+labels = dataForDT[['leftRight']]
 
 labels = labels.reset_index()
 labels = labels.drop(['time'], axis=1)
 print(labels)
+print(labels.describe())
 features = dataForDT.drop(['leftRight', 'frontBack', 'angular'], axis=1)
 
 # save a part of data as a test data
