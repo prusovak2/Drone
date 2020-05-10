@@ -1,55 +1,106 @@
 import pandas as pd
 import numpy as np
-from PrepareDataDT import dataForDTRealImagFrozenDict
-from PrepareDataDT import Cmd
+import graphviz
+from CreateDataMatrixForDT import dataForDTRealImagFrozenDict
+from CreateDataMatrixForDT import Cmd
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.tree import DecisionTreeRegressor
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import GridSearchCV
 from sklearn.preprocessing import StandardScaler
 
-dataForDTRealImagFrozenDict.describe()
+def GetLabel(labelColumn, dataMatrix):
+    labels = dataMatrix[[labelColumn]]
+    labels = labels.reset_index()
+    labels = labels.drop(['time'], axis=1)
+    # print(labels)
+    # print(labels.describe())
+    return labels
+
+def GetFeatures(dataMatrix):
+    features = dataMatrix.drop(['leftRight', 'frontBack', 'angular'], axis=1)
+    return features
+
+def CrossValidation(pipeline, params_to_try, x_train, y_train, x_test, y_test):
+    score = 0
+    DT_criterion = ''
+    DT_maxDepth = 0
+    for cv in range(3, 6):
+        create_grid = GridSearchCV(pipeline, param_grid=params_to_try, cv=cv)
+        create_grid.fit(x_train, y_train)
+        newScore = create_grid.score(x_test, y_test)
+        print("score for %d fold cross validation is %3.2f" % (cv, newScore))
+        print("best fit params:")
+        bestParams = create_grid.best_params_
+        print(bestParams)
+        if newScore > score:
+            score = newScore
+            DT_criterion = bestParams['decisionTree__criterion']
+            DT_maxDepth = bestParams['decisionTree__max_depth']
+    return {'DT_criterion': DT_criterion, 'DT_maxDepth': DT_maxDepth}
+
+def BuildAndGraphDT(labelColumn, dataMatrix, pipeline, params_to_try, pngFileName):
+    # split what I wanna predict from what I wanna base a prediction on
+    labels = GetLabel(labelColumn, dataMatrix)
+    features = GetFeatures(dataMatrix)
+
+    x_train, x_test, y_train, y_test = train_test_split(features, labels, test_size=0.20, stratify=labels)
+    print("num of training samples: ", len(x_train))
+    print("num of test samples: ", len(y_test))
+
+    # estimate the best params for DT
+    bestParams = CrossValidation(pipeline, params_to_try, x_train, y_train, x_test, y_test)
+
+    # build DT
+    decisionTree = DecisionTreeClassifier(criterion=bestParams['DT_criterion'], max_depth=bestParams['DT_maxDepth'])
+    decisionTree.fit(x_train, y_train)
+
+    GraphTree(decisionTree, features, pngFileName)
+    return decisionTree
+
+
+def GraphTree(decisionTree, features, pngFileName):
+    from sklearn.externals.six import StringIO
+    from IPython.display import Image
+    from sklearn.tree import export_graphviz
+    import pydotplus
+    from CreateDataMatrixForDT import frozenCmds
+
+    dot_data = StringIO()
+
+    print([*frozenCmds.values()])
+    featureNames = features.columns
+    export_graphviz(decisionTree, out_file=dot_data, filled=True, rounded=True, special_characters=True,
+                    feature_names=featureNames,
+                    class_names=[*frozenCmds.values()])
+
+    graph = pydotplus.graph_from_dot_data(dot_data.getvalue())
+    graph.write_png('OutputStages\\Graphs\\%s' %pngFileName)
+    Image(graph.create_png())
+
+
 dataForDT = dataForDTRealImagFrozenDict
-
-# split what I wanna predict from what I wanna base a prediction on
-labels = dataForDT[['leftRight']]
-
-labels = labels.reset_index()
-labels = labels.drop(['time'], axis=1)
-print(labels)
-print(labels.describe())
-features = dataForDT.drop(['leftRight', 'frontBack', 'angular'], axis=1)
-
-# save a part of data as a test data
-x_train, x_test, y_train, y_test = train_test_split(features, labels, test_size=0.20, stratify=labels)
-
-print("num of training samples: ", len(x_train))
-print("num of test samples: ", len(y_test))
-
 # prepare pipeline, that carries out a data standartization - to make a features have a variance in a same order
 # and creates DT
 pipe_steps = [('scaler', StandardScaler()), ('decisionTree', DecisionTreeClassifier())]
 pipeline = Pipeline(pipe_steps)
 print(pipeline)
+print(pipeline.get_params().keys())
 
-# DT attributes I wanna estimate - are there any other
+# DT attributes I wanna estimate - are there any other?
 params_to_try = {'decisionTree__criterion': ['gini', 'entropy'],
                  'decisionTree__max_depth': np.arange(3, 15)}
 # np.arange(3, 15): totally random estimation of max tree depth taken from a tutorial. I have no clue whether it
 # makes sense in this case!!
 
-print(pipeline.get_params().keys())
+# build decision trees
+DTleftRight = BuildAndGraphDT('leftRight', dataForDT, pipeline, params_to_try, 'leftRightDT.png')
+DTfrontBack = BuildAndGraphDT('frontBack', dataForDT, pipeline, params_to_try, 'frontBackDT.png')
+DTangular = BuildAndGraphDT('angular', dataForDT, pipeline, params_to_try, 'angular.png')
 
-'''
-for cv in range(3, 6):
-    create_grid = GridSearchCV(pipeline, param_grid=params_to_try, cv=cv)
-    create_grid.fit(x_train, y_train)
-    print("score for %d fold cross validation is %3.2f", (cv, create_grid.score(x_test, y_test)))
-    print("bast fit params:")
-    print(create_grid.best_params_)
-'''
 
-decisionTree = DecisionTreeClassifier(criterion='gini', max_depth=6)
-decisionTree.fit(x_train, y_train)
+
+
+
+
 
