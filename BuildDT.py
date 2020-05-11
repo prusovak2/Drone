@@ -99,7 +99,7 @@ GraphTree(DTleftRight, features, 'leftRightDT.png')
 DTfrontBack, x_trainFB, y_trainFB, x_testFB, y_testFB = BuildDT('frontBack', dataForDT, pipeline, params_to_try)
 GraphTree(DTfrontBack, features, 'frontBackDT.png')
 DTangular, x_trainA, y_trainA, x_testA, y_testA = BuildDT('angular', dataForDT, pipeline, params_to_try)
-GraphTree(DTangular, features, 'angular.png')
+GraphTree(DTangular, features, 'angularDT.png')
 
 
 
