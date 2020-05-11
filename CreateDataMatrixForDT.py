@@ -173,6 +173,7 @@ def CreateDataFrameForDTMatrix(inputDFmerged, ColumnNames, functionToCreateConte
     return newDF
 
 from ReadResampleMerge import merged
+from ReadResampleMerge import mergedCM
 
 '''
 # Create DataForDTComplex
@@ -203,9 +204,18 @@ dataForDTRealImagEnum.to_csv('OutputStages\\dataForDTRealImagEnum.tsv', sep='\t'
 
 # Create Data fot DT with separated real and imag part and cmds as frozen set item
 frozenCmds = frozendict({1: '-', 2: '0', 3: '+'})
-dataForDTRealImagFrozenDict = CreateDataFrameForDTMatrix(inputDFmerged=merged, ColumnNames=dataColumnNamesRealImag, functionToCreateContend=CreateDataWithRealAndImagPart,
-                                                         functionToDiscreteCmds=MakeCMDsDiscreteWithFrozenDict, intervalLen=40)
+# Original data
+dataForDTRealImagFrozenDict = CreateDataFrameForDTMatrix(inputDFmerged=merged, ColumnNames=dataColumnNamesRealImag,
+                                                         functionToCreateContend=CreateDataWithRealAndImagPart,
+                                                         functionToDiscreteCmds=MakeCMDsDiscreteWithFrozenDict,
+                                                         intervalLen=40)
 dataForDTRealImagFrozenDict.to_csv('OutputStages\\dataForDTRealImagFrozenDict.tsv', sep='\t')
+# new data for Confusion Matrix - evaluation of DT
+dataForCM = CreateDataFrameForDTMatrix(inputDFmerged=mergedCM, ColumnNames=dataColumnNamesRealImag,
+                                       functionToCreateContend=CreateDataWithRealAndImagPart,
+                                       functionToDiscreteCmds=MakeCMDsDiscreteWithFrozenDict,
+                                       intervalLen=40)
+dataForCM.to_csv('OutputStages\\dataForCM.tsv', sep='\t')
 
 
 
