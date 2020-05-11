@@ -39,7 +39,7 @@ def CrossValidation(pipeline, params_to_try, x_train, y_train, x_test, y_test):
             DT_maxDepth = bestParams['decisionTree__max_depth']
     return {'DT_criterion': DT_criterion, 'DT_maxDepth': DT_maxDepth}
 
-def BuildAndGraphDT(labelColumn, dataMatrix, pipeline, params_to_try, pngFileName):
+def BuildDT(labelColumn, dataMatrix, pipeline, params_to_try):
     # split what I wanna predict from what I wanna base a prediction on
     labels = GetLabel(labelColumn, dataMatrix)
     features = GetFeatures(dataMatrix)
@@ -55,8 +55,7 @@ def BuildAndGraphDT(labelColumn, dataMatrix, pipeline, params_to_try, pngFileNam
     decisionTree = DecisionTreeClassifier(criterion=bestParams['DT_criterion'], max_depth=bestParams['DT_maxDepth'])
     decisionTree.fit(x_train, y_train)
 
-    GraphTree(decisionTree, features, pngFileName)
-    return decisionTree
+    return decisionTree, x_train, y_train, x_test, y_test
 
 
 def GraphTree(decisionTree, features, pngFileName):
@@ -93,10 +92,14 @@ params_to_try = {'decisionTree__criterion': ['gini', 'entropy'],
 # np.arange(3, 15): totally random estimation of max tree depth taken from a tutorial. I have no clue whether it
 # makes sense in this case!!
 
-# build decision trees
-DTleftRight = BuildAndGraphDT('leftRight', dataForDT, pipeline, params_to_try, 'leftRightDT.png')
-DTfrontBack = BuildAndGraphDT('frontBack', dataForDT, pipeline, params_to_try, 'frontBackDT.png')
-DTangular = BuildAndGraphDT('angular', dataForDT, pipeline, params_to_try, 'angular.png')
+# build and graph decision trees
+features = GetFeatures(dataForDT)
+DTleftRight, x_trainLR, y_trainLR, x_testLR, y_testLR = BuildDT('leftRight', dataForDT, pipeline, params_to_try)
+GraphTree(DTleftRight, features, 'leftRightDT.png')
+DTfrontBack, x_trainFB, y_trainFB, x_testFB, y_testFB = BuildDT('frontBack', dataForDT, pipeline, params_to_try)
+GraphTree(DTfrontBack, features, 'frontBackDT.png')
+DTangular, x_trainA, y_trainA, x_testA, y_testA = BuildDT('angular', dataForDT, pipeline, params_to_try)
+GraphTree(DTangular, features, 'angular.png')
 
 
 
