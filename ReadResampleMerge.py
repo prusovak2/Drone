@@ -27,11 +27,10 @@ def ReadNAVDATAcsvIntoDFandResample(filename, frequency):
     # some debug print for adjusting function to new data files
     # suffix = filename[12:]
     # navData.to_csv("OutputStages\\tmpNav"+suffix, sep='\t')
-    print("unique navdata time:", navData.time.is_unique)
+    # print("unique navdata time:", navData.time.is_unique)
     # get rid of duplicated times in navData
     navData.drop_duplicates(['time'], keep='first', inplace=True)
-
-    print("unique navdata time after .drop_duplicated call:", navData.time.is_unique)
+    #print("unique navdata time after .drop_duplicated call:", navData.time.is_unique)
     navData.time = pd.to_datetime(navData.time, unit='ms')
     navData = navData.set_index('time')
 
@@ -74,6 +73,12 @@ def ReadResampleMerge(cmdsFilename, navdataFilename, frequency, cmdOutputTsvFile
     return merged
 
 def addTabs(filename, outputFile):
+    '''
+    adds a column of tabs at the beginning of a file
+    :param filename:
+    :param outputFile:
+    :return:
+    '''
     with open(filename, mode='r') as input:
         with open(outputFile, mode='w') as output:
             for line in input:
@@ -92,20 +97,4 @@ mergedCM = ReadResampleMerge('InputData\\commandsCM.tsv', 'InputData\\navdataCMT
 # TODO: after this outputDF is indexed by senceless dates begginning with start of unix date - does it make any sence?
 # TODO: can I somehow format string representation of values in particular columns while printing them to file by to_scv
 # TODO: to print 'time' in some meaningfull format
-'''
-# ######################## DATASETS FOR CONFUSION MATRIX (MODEL VALIDATION) ############################################
-# READ AND RESAMPLE INPUT DATA
-resampledCmdsCM = ReadCMDScvsIntoDFandResample('InputData\\commandsCM.tsv', '50ms')
-resampledCmds.to_csv('OutputStages\\resampledCmdsCM.tsv', sep='\t')
 
-resampledNavCM =ReadNAVDATAcsvIntoDFandResample('InputData\\navdataCM.tsv', '50ms', resampledCmdsCM)
-resampledNav.to_csv('OutputStages\\resampledNavCM.tsv', sep='\t')
-
-# MERGE INPUT DATA
-# how inner - intersection, keeps only times that do have corresponding counterpart in second file
-merged = pd.merge(resampledCmds, resampledNav, right_index=True, left_index=True, how='inner') #merge when time is index
-#inputDF = pd.merge(cmds, navData, right_on="time", left_on="time", how='inner', indicator=True)
-
-merged.to_csv("OutputStages\\mergedResampled.tsv", sep='\t')
-# print("unique time right after merge:", merged.index.is_unique)
-'''
