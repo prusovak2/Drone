@@ -77,7 +77,7 @@ def BuildDT(labelColumn, dataMatrix, pipeline, params_to_try):
     features = GetFeatures(dataMatrix)
 
     # split data to training and testing part
-    x_train, x_test, y_train, y_test = train_test_split(features, labels, test_size=0.20, stratify=labels)
+    x_train, x_test, y_train, y_test = train_test_split(features, labels, test_size=0.20, stratify=labels) # random_state = 42 to get the same result each time
     print("num of training samples: ", len(x_train))
     print("num of test samples: ", len(y_test))
 
