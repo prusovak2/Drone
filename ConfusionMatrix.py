@@ -41,9 +41,9 @@ CreateConfusionMatrix('leftRight', dataForCM, bdt.DTleftRight, "leftRightCM", pl
 CreateConfusionMatrix('frontBack', dataForCM, bdt.DTfrontBack, "frontBackCM", plt.cm.Blues)
 CreateConfusionMatrix('angular', dataForCM, bdt.DTangular, "angularCM", plt.cm.Blues)
 
-CreateConfusionMatrix('leftRight', dataForCM, bdt.DTleftRightSecond, "leftRightCMSecond", plt.cm.Reds)
-CreateConfusionMatrix('frontBack', dataForCM, bdt.DTfrontBackSecond, "frontBackCMSecond", plt.cm.Reds)
-CreateConfusionMatrix('angular', dataForCM, bdt.DTangularSecond, "angularCMSecond", plt.cm.Reds)
+CreateConfusionMatrix('leftRight', dataDTSecondCM, bdt.DTleftRightSecond, "leftRightCMSecond", plt.cm.Reds)
+CreateConfusionMatrix('frontBack', dataDTSecondCM, bdt.DTfrontBackSecond, "frontBackCMSecond", plt.cm.Reds)
+CreateConfusionMatrix('angular', dataDTSecondCM, bdt.DTangularSecond, "angularCMSecond", plt.cm.Reds)
 
 '''
 realLabels = bdt.GetLabel("leftRight", dataForCM)
