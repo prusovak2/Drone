@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import graphviz
 from CreateDataMatrixForDT import dataForDTRealImagFrozenDict
+from CreateDataMatrixForDT import dataDTSecondSet
 from CreateDataMatrixForDT import Cmd
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
@@ -141,7 +142,16 @@ GraphTree(DTfrontBack, features, 'frontBackDT.png')
 DTangular, x_trainA, y_trainA, x_testA, y_testA = BuildDT('angular', dataForDT, pipeline, params_to_try)
 GraphTree(DTangular, features, 'angularDT.png')
 
-scaler.fit(x_trainLR)
+# build and graph decision trees based on the second data set
+featuresSecond = GetFeatures(dataDTSecondSet)
+DTleftRightSecond, x_trainLRSecond, y_trainLRSecond, x_testLRSecond, y_testLRSecond = BuildDT('leftRight', dataDTSecondSet, pipeline, params_to_try)
+GraphTree(DTleftRightSecond, featuresSecond, 'leftRightDTSecond.png')
+DTfrontBackSecond, x_trainFBSecond, y_trainFBSecond, x_testFBSecond, y_testFBSecond = BuildDT('frontBack', dataDTSecondSet, pipeline, params_to_try)
+GraphTree(DTfrontBackSecond, featuresSecond, 'frontBackDTSecond.png')
+DTangularSecond, x_trainASecond, y_trainASecond, x_testASecond, y_testASecond = BuildDT('angular', dataDTSecondSet, pipeline, params_to_try)
+GraphTree(DTangularSecond, featuresSecond, 'angularDTSecond.png')
+
+
 
 
 

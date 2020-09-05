@@ -7,10 +7,11 @@ import matplotlib.pyplot as plt
 import BuildDT as bdt
 from CreateDataMatrixForDT import dataForCM
 from CreateDataMatrixForDT import frozenCmds
+from CreateDataMatrixForDT import dataDTSecondCM
 
 
 # TODO: standartisation of cm data? if so, how?
-def CreateConfusionMatrix(labelColumnName, validationDataMatrix, decisionTree, cmTitle):
+def CreateConfusionMatrix(labelColumnName, validationDataMatrix, decisionTree, cmTitle, color):
     '''
     for given decision tree creates a confusion matrix showing how well DT performs while predicting
     labels from validationDataMatrix Dt was not trained on
@@ -28,7 +29,7 @@ def CreateConfusionMatrix(labelColumnName, validationDataMatrix, decisionTree, c
 
     disp = plot_confusion_matrix(decisionTree, features, realLabels,
                                  display_labels=[*frozenCmds.values()],
-                                 cmap=plt.cm.Blues,
+                                 cmap=color,
                                  normalize=None)
     disp.ax_.set_title(cmTitle)
     print(cmTitle)
@@ -36,9 +37,14 @@ def CreateConfusionMatrix(labelColumnName, validationDataMatrix, decisionTree, c
     plt.show()
 
 
-CreateConfusionMatrix('leftRight', dataForCM, bdt.DTleftRight, "leftRightCM")
-CreateConfusionMatrix('frontBack', dataForCM, bdt.DTfrontBack, "frontBackCM")
-CreateConfusionMatrix('angular', dataForCM, bdt.DTangular, "angularCM")
+CreateConfusionMatrix('leftRight', dataForCM, bdt.DTleftRight, "leftRightCM", plt.cm.Blues)
+CreateConfusionMatrix('frontBack', dataForCM, bdt.DTfrontBack, "frontBackCM", plt.cm.Blues)
+CreateConfusionMatrix('angular', dataForCM, bdt.DTangular, "angularCM", plt.cm.Blues)
+
+CreateConfusionMatrix('leftRight', dataForCM, bdt.DTleftRightSecond, "leftRightCMSecond", plt.cm.Reds)
+CreateConfusionMatrix('frontBack', dataForCM, bdt.DTfrontBackSecond, "frontBackCMSecond", plt.cm.Reds)
+CreateConfusionMatrix('angular', dataForCM, bdt.DTangularSecond, "angularCMSecond", plt.cm.Reds)
+
 '''
 realLabels = bdt.GetLabel("leftRight", dataForCM)
 features = bdt.GetFeatures(dataForCM)

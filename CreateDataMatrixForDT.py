@@ -1,7 +1,10 @@
 import pandas as pd
 import numpy as np
 from frozendict import frozendict
-
+from ReadResampleMerge import merged
+from ReadResampleMerge import mergedCM
+from ReadResampleMerge import mergedSecondSet
+from ReadResampleMerge import mergedSecondCM
 
 def CreateEmptyDataFrame(intervalLen, intIndexedDF, dataColumnNames):
     '''
@@ -244,8 +247,8 @@ def CreateDataFrameForDTMatrix(inputDFmerged, ColumnNames, functionToCreateConte
 
     return newDF
 
-from ReadResampleMerge import merged
-from ReadResampleMerge import mergedCM
+
+
 
 '''
 # Create DataForDTComplex
@@ -290,6 +293,16 @@ dataForCM = CreateDataFrameForDTMatrix(inputDFmerged=mergedCM, ColumnNames=dataC
                                        intervalLen=40)
 dataForCM.to_csv('OutputStages\\dataForCM.tsv', sep='\t')
 
+dataDTSecondSet = CreateDataFrameForDTMatrix(inputDFmerged=mergedSecondSet, ColumnNames=dataColumnNamesRealImag,
+                                       functionToCreateContend=CreateDataWithRealAndImagPart,
+                                       functionToDiscreteCmds=MakeCMDsDiscreteWithFrozenDict,
+                                       intervalLen=40)
+dataDTSecondSet.to_csv('OutputStages\\dataDTSecondSet.tsv', sep='\t')
 
+dataDTSecondCM = CreateDataFrameForDTMatrix(inputDFmerged=mergedSecondCM, ColumnNames=dataColumnNamesRealImag,
+                                       functionToCreateContend=CreateDataWithRealAndImagPart,
+                                       functionToDiscreteCmds=MakeCMDsDiscreteWithFrozenDict,
+                                       intervalLen=40)
+dataDTSecondSet.to_csv('OutputStages\\dataDTSecondCM.tsv', sep='\t')
 
 
