@@ -2,6 +2,12 @@ import pandas as pd
 import numpy as np
 
 def ReadCMDScvsIntoDFandResample(filename, frequency):
+    '''
+    reads CMD file and resamples it to given frequency
+    :param filename:
+    :param frequency:
+    :return: dataFrame containing resampled CMDs
+    '''
     cmdsColumnNames = ['time', 'leftRight', 'frontBack', 'up', 'angular']
     cmds = pd.read_csv(filename, delimiter='\t', header=None, names=cmdsColumnNames)
     cmds.time = pd.to_datetime(cmds.time, unit='ms')
@@ -14,6 +20,12 @@ def ReadCMDScvsIntoDFandResample(filename, frequency):
     return resampledCmds
 
 def ReadNAVDATAcsvIntoDFandResample(filename, frequency):
+    '''
+    reads NAVDATA file and resamples it to given frequency
+    :param filename:
+    :param frequency:
+    :return: dataFrame containing resampled NAVDATA
+    '''
     navDataColumnNames = ['time', 'State', 'Battery_level', 'Magnetometer_x', 'Magnetometer_y', 'Magnetometer_z',
                           'Pressure',
                           'Temperature', 'Wind_speed', 'Wind_angle', 'Wind_compensation:pitch',
@@ -28,6 +40,7 @@ def ReadNAVDATAcsvIntoDFandResample(filename, frequency):
     # suffix = filename[12:]
     # navData.to_csv("OutputStages\\tmpNav"+suffix, sep='\t')
     # print("unique navdata time:", navData.time.is_unique)
+
     # get rid of duplicated times in navData
     navData.drop_duplicates(['time'], keep='first', inplace=True)
     #print("unique navdata time after .drop_duplicated call:", navData.time.is_unique)
@@ -44,7 +57,7 @@ def ReadResampleMerge(cmdsFilename, navdataFilename, frequency, cmdOutputTsvFile
                       mergedOutputTsvFilename=None):
     '''
     reads cmd and navdata files, resamples them to given frequency and results merges by ctime
-    whne output file names are given, prints corresponding outputs to .tsv files
+    when output file names are given, prints corresponding outputs to .tsv files
     :param cmdsFilename:
     :param navdataFilename:
     :param frequency:

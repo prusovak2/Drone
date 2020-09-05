@@ -10,6 +10,12 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.preprocessing import StandardScaler
 
 def GetLabel(labelColumn, dataMatrix):
+    '''
+    separates a column to be predicted
+    :param labelColumn:
+    :param dataMatrix:
+    :return: selected label column
+    '''
     labels = dataMatrix[[labelColumn]]
     labels = labels.reset_index()
     labels = labels.drop(['time'], axis=1)
@@ -18,10 +24,26 @@ def GetLabel(labelColumn, dataMatrix):
     return labels
 
 def GetFeatures(dataMatrix):
+    '''
+    separates columns to base a prediction on
+    :param dataMatrix:
+    :return: feature columns
+    '''
     features = dataMatrix.drop(['leftRight', 'frontBack', 'angular'], axis=1)
     return features
 
 def CrossValidation(pipeline, params_to_try, x_train, y_train, x_test, y_test):
+    '''
+    tries 3,4 and 5 cross validation of decision tree
+    returns parameters of decision tree with the best score
+    :param pipeline:
+    :param params_to_try:
+    :param x_train:
+    :param y_train:
+    :param x_test:
+    :param y_test:
+    :return:
+    '''
     score = 0
     DT_criterion = ''
     DT_maxDepth = 0
@@ -40,10 +62,20 @@ def CrossValidation(pipeline, params_to_try, x_train, y_train, x_test, y_test):
     return {'DT_criterion': DT_criterion, 'DT_maxDepth': DT_maxDepth}
 
 def BuildDT(labelColumn, dataMatrix, pipeline, params_to_try):
-    # split what I wanna predict from what I wanna base a prediction on
+    '''
+    for a given label column tries to determine the best decision tree parameters via 3,4 and 5 cross validation
+    then builds a decision tree with the best parameters found
+    :param labelColumn:
+    :param dataMatrix:
+    :param pipeline:
+    :param params_to_try:
+    :return:
+    '''
+    # split what I want to predict from what I want to base a prediction on
     labels = GetLabel(labelColumn, dataMatrix)
     features = GetFeatures(dataMatrix)
 
+    # split data to training and testing part
     x_train, x_test, y_train, y_test = train_test_split(features, labels, test_size=0.20, stratify=labels)
     print("num of training samples: ", len(x_train))
     print("num of test samples: ", len(y_test))
@@ -59,6 +91,13 @@ def BuildDT(labelColumn, dataMatrix, pipeline, params_to_try):
 
 
 def GraphTree(decisionTree, features, pngFileName):
+    '''
+    outputs a graph of a decisionTree into pngFileName output file
+    :param decisionTree:
+    :param features:
+    :param pngFileName:
+    :return:
+    '''
     from sklearn.externals.six import StringIO
     from IPython.display import Image
     from sklearn.tree import export_graphviz
@@ -81,7 +120,8 @@ def GraphTree(decisionTree, features, pngFileName):
 dataForDT = dataForDTRealImagFrozenDict
 # prepare pipeline, that carries out a data standartization - to make a features have a variance in a same order
 # and creates DT
-pipe_steps = [('scaler', StandardScaler()), ('decisionTree', DecisionTreeClassifier())]
+scaler = StandardScaler()
+pipe_steps = [('scaler', scaler), ('decisionTree', DecisionTreeClassifier())]
 pipeline = Pipeline(pipe_steps)
 print(pipeline)
 print(pipeline.get_params().keys())
@@ -100,6 +140,8 @@ DTfrontBack, x_trainFB, y_trainFB, x_testFB, y_testFB = BuildDT('frontBack', dat
 GraphTree(DTfrontBack, features, 'frontBackDT.png')
 DTangular, x_trainA, y_trainA, x_testA, y_testA = BuildDT('angular', dataForDT, pipeline, params_to_try)
 GraphTree(DTangular, features, 'angularDT.png')
+
+scaler.fit(x_trainLR)
 
 
 

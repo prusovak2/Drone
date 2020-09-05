@@ -8,10 +8,23 @@ import BuildDT as bdt
 from CreateDataMatrixForDT import dataForCM
 from CreateDataMatrixForDT import frozenCmds
 
+
+# TODO: standartisation of cm data? if so, how?
 def CreateConfusionMatrix(labelColumnName, validationDataMatrix, decisionTree, cmTitle):
+    '''
+    for given decision tree creates a confusion matrix showing how well DT performs while predicting
+    labels from validationDataMatrix Dt was not trained on
+    :param labelColumnName: name of a label column that is predicted bt DT
+    :param validationDataMatrix: data matrix, that DT was not trained on
+    :param decisionTree: DT whose quality is to be evaluated
+    :param cmTitle: name fot an output confusion matrix
+    :return:
+    '''
     realLabels = bdt.GetLabel(labelColumnName, validationDataMatrix)
     features = bdt.GetFeatures(validationDataMatrix)
     predictedLabels = decisionTree.predict(features)
+    # if labelColumnName == 'leftRight':
+    #    features = bdt.scaler.transform(features)
 
     disp = plot_confusion_matrix(decisionTree, features, realLabels,
                                  display_labels=[*frozenCmds.values()],

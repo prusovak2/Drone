@@ -4,25 +4,43 @@ from frozendict import frozendict
 
 
 def CreateEmptyDataFrame(intervalLen, intIndexedDF, dataColumnNames):
-    # create matrix to base machine learning on
+    '''
+    create matrix to base a machine learning on
+    indexed starting point of time intervals of intervalLen
+    :param intervalLen:
+    :param intIndexedDF:
+    :param dataColumnNames:
+    :return: empty indexed dataFrame
+    '''
     # intervalLen = 40
     # prepare indices for a new dataframe
     ind = list()
-    indexIterator = 0
+    indexIterator = 0 # int, counts rows
     while indexIterator < intIndexedDF.index.size:
+        # time from the row corresponding to index iterator - STARTING point of the interval
         ind.append(intIndexedDF.time.iloc[indexIterator])
+        # move by intervalLen number of rows ahead
         indexIterator += intervalLen
     #print(ind)
     #print(indexIterator)
 
     # create an empty dataframe
     dataForDT = pd.DataFrame(columns=dataColumnNames, index=ind)
+    # interpret ind as a time (it is a time)
     dataForDT.index = pd.to_datetime(dataForDT.index, unit='ms')
     dataForDT.index.name = 'time'
     return dataForDT
 
 
 def MakeCMDsDiscrete(index, inputDF, outputDF):
+    '''
+    gain discrete value of CMDs on given index
+    doesn't work properly
+    :param index:
+    :param inputDF:
+    :param outputDF:
+    :return:
+    '''
     #cmds
     #leftRight
     if inputDF.leftRight[index] <= -0.05:
@@ -59,6 +77,15 @@ class Cmd(Enum):
 
 
 def MakeCMDsDiscreteWithEnum(index, inputDF, outputDF):
+    '''
+    gain discrete value of CMDs on given index
+    discrete values represented as members of enum
+    doesn't work properly
+    :param index:
+    :param inputDF:
+    :param outputDF:
+    :return:
+    '''
     # cmds
     # leftRight
     if inputDF.leftRight[index] <= -0.05:
@@ -86,6 +113,16 @@ def MakeCMDsDiscreteWithEnum(index, inputDF, outputDF):
 
 
 def MakeCMDsDiscreteWithFrozenDict(index, inputDF, outputDF):
+    '''
+    USE THIS
+    gain discrete value of CMDs on given index
+    discrete values represented as values from frozen dictionary
+    works
+    :param index:
+    :param inputDF:
+    :param outputDF:
+    :return:
+    '''
     # cmds
     # leftRight
     if inputDF.leftRight[index] <= -0.05:
@@ -113,6 +150,18 @@ def MakeCMDsDiscreteWithFrozenDict(index, inputDF, outputDF):
 
 
 def CreateDataWithComplexValues(index, indexIterator, intervalLen, inputDF, outputDF):
+    '''
+    fill one row of dataFrame for decisionTree with data
+    for roll, pitch and jaw count mean, std and mean and std of fft
+    each row represents one interval of intervalLen records from inputDF
+    keep complex values in outputDF
+    :param index:
+    :param indexIterator:
+    :param intervalLen:
+    :param inputDF:
+    :param outputDF:
+    :return:
+    '''
     # Roll
     outputDF.Roll_Mean[index] = np.mean(inputDF.Roll_x.iloc[indexIterator:indexIterator + intervalLen])
     outputDF.Roll_SD[index] = np.std(inputDF.Roll_x.iloc[indexIterator:indexIterator + intervalLen])
@@ -134,6 +183,18 @@ def CreateDataWithComplexValues(index, indexIterator, intervalLen, inputDF, outp
 
 
 def CreateDataWithRealAndImagPart(index, indexIterator, intervalLen, inputDF, outputDF):
+    '''
+    fill one row of dataFrame for decisionTree with data
+    for roll, pitch and jaw count mean, std and mean and std of fft
+    each row represents one interval of intervalLen records from inputDF
+    split complex values to real and imaginary part
+    :param index:
+    :param indexIterator:
+    :param intervalLen:
+    :param inputDF:
+    :param outputDF:
+    :return:
+    '''
     # Roll
     outputDF.Roll_Mean[index] = np.mean(inputDF.Roll_x.iloc[indexIterator:indexIterator + intervalLen])
     outputDF.Roll_SD[index] = np.std(inputDF.Roll_x.iloc[indexIterator:indexIterator + intervalLen])
@@ -161,9 +222,20 @@ def CreateDataWithRealAndImagPart(index, indexIterator, intervalLen, inputDF, ou
 
 
 def CreateDataFrameForDTMatrix(inputDFmerged, ColumnNames, functionToCreateContend, functionToDiscreteCmds, intervalLen=40):
+    '''
+    splits rows to intervalLen long intervals, counts mean, std and mean and std of ffr within these intervals
+    creates a new dataFrame with one row for each interval, time index of row is the time of the first record in the interval
+    :param inputDFmerged:
+    :param ColumnNames:
+    :param functionToCreateContend:
+    :param functionToDiscreteCmds:
+    :param intervalLen:
+    :return: dataFrame to base decision tree on
+    '''
     intIndexed = inputDFmerged.reset_index()
     newDF = CreateEmptyDataFrame(intervalLen, intIndexed, ColumnNames)
 
+    # fill dataFrame with data
     indexIterator = 0
     for index in newDF.index:
         functionToDiscreteCmds(index, inputDFmerged, newDF)
@@ -205,6 +277,7 @@ dataForDTRealImagEnum.to_csv('OutputStages\\dataForDTRealImagEnum.tsv', sep='\t'
 # Create Data fot DT with separated real and imag part and cmds as frozen set item
 frozenCmds = frozendict({1: '-', 2: '0', 3: '+'})
 # Original data
+# create dataFrame to base a decision tree on
 dataForDTRealImagFrozenDict = CreateDataFrameForDTMatrix(inputDFmerged=merged, ColumnNames=dataColumnNamesRealImag,
                                                          functionToCreateContend=CreateDataWithRealAndImagPart,
                                                          functionToDiscreteCmds=MakeCMDsDiscreteWithFrozenDict,
