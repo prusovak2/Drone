@@ -37,6 +37,7 @@ def CreateConfusionMatrix(labelColumnName, validationDataMatrix, decisionTree, c
     plt.show()
 
 
+
 CreateConfusionMatrix('leftRight', dataForCM, bdt.DTleftRight, "leftRightCM", plt.cm.Blues)
 CreateConfusionMatrix('frontBack', dataForCM, bdt.DTfrontBack, "frontBackCM", plt.cm.Blues)
 CreateConfusionMatrix('angular', dataForCM, bdt.DTangular, "angularCM", plt.cm.Blues)
