@@ -117,39 +117,39 @@ def GraphTree(decisionTree, features, pngFileName):
     graph.write_png('OutputStages\\Graphs\\%s' %pngFileName)
     Image(graph.create_png())
 
+if __name__ == "__main__":
+    dataForDT = dataForDTRealImagFrozenDict
+    # prepare pipeline, that carries out a data standartization - to make a features have a variance in a same order
+    # and creates DT
+    scaler = StandardScaler()
+    pipe_steps = [('scaler', scaler), ('decisionTree', DecisionTreeClassifier())]
+    pipeline = Pipeline(pipe_steps)
+    print(pipeline)
+    print(pipeline.get_params().keys())
 
-dataForDT = dataForDTRealImagFrozenDict
-# prepare pipeline, that carries out a data standartization - to make a features have a variance in a same order
-# and creates DT
-scaler = StandardScaler()
-pipe_steps = [('scaler', scaler), ('decisionTree', DecisionTreeClassifier())]
-pipeline = Pipeline(pipe_steps)
-print(pipeline)
-print(pipeline.get_params().keys())
+    # DT attributes I wanna estimate - are there any other?
+    params_to_try = {'decisionTree__criterion': ['gini', 'entropy'],
+                     'decisionTree__max_depth': np.arange(3, 15)}
+    # np.arange(3, 15): totally random estimation of max tree depth taken from a tutorial. I have no clue whether it
+    # makes sense in this case!!
 
-# DT attributes I wanna estimate - are there any other?
-params_to_try = {'decisionTree__criterion': ['gini', 'entropy'],
-                 'decisionTree__max_depth': np.arange(3, 15)}
-# np.arange(3, 15): totally random estimation of max tree depth taken from a tutorial. I have no clue whether it
-# makes sense in this case!!
+    # build and graph decision trees
+    features = GetFeatures(dataForDT)
+    DTleftRight, x_trainLR, y_trainLR, x_testLR, y_testLR = BuildDT('leftRight', dataForDT, pipeline, params_to_try)
+    GraphTree(DTleftRight, features, 'leftRightDT.png')
+    DTfrontBack, x_trainFB, y_trainFB, x_testFB, y_testFB = BuildDT('frontBack', dataForDT, pipeline, params_to_try)
+    GraphTree(DTfrontBack, features, 'frontBackDT.png')
+    DTangular, x_trainA, y_trainA, x_testA, y_testA = BuildDT('angular', dataForDT, pipeline, params_to_try)
+    GraphTree(DTangular, features, 'angularDT.png')
 
-# build and graph decision trees
-features = GetFeatures(dataForDT)
-DTleftRight, x_trainLR, y_trainLR, x_testLR, y_testLR = BuildDT('leftRight', dataForDT, pipeline, params_to_try)
-GraphTree(DTleftRight, features, 'leftRightDT.png')
-DTfrontBack, x_trainFB, y_trainFB, x_testFB, y_testFB = BuildDT('frontBack', dataForDT, pipeline, params_to_try)
-GraphTree(DTfrontBack, features, 'frontBackDT.png')
-DTangular, x_trainA, y_trainA, x_testA, y_testA = BuildDT('angular', dataForDT, pipeline, params_to_try)
-GraphTree(DTangular, features, 'angularDT.png')
-
-# build and graph decision trees based on the second data set
-featuresSecond = GetFeatures(dataDTSecondSet)
-DTleftRightSecond, x_trainLRSecond, y_trainLRSecond, x_testLRSecond, y_testLRSecond = BuildDT('leftRight', dataDTSecondSet, pipeline, params_to_try)
-GraphTree(DTleftRightSecond, featuresSecond, 'leftRightDTSecond.png')
-DTfrontBackSecond, x_trainFBSecond, y_trainFBSecond, x_testFBSecond, y_testFBSecond = BuildDT('frontBack', dataDTSecondSet, pipeline, params_to_try)
-GraphTree(DTfrontBackSecond, featuresSecond, 'frontBackDTSecond.png')
-DTangularSecond, x_trainASecond, y_trainASecond, x_testASecond, y_testASecond = BuildDT('angular', dataDTSecondSet, pipeline, params_to_try)
-GraphTree(DTangularSecond, featuresSecond, 'angularDTSecond.png')
+    # build and graph decision trees based on the second data set
+    featuresSecond = GetFeatures(dataDTSecondSet)
+    DTleftRightSecond, x_trainLRSecond, y_trainLRSecond, x_testLRSecond, y_testLRSecond = BuildDT('leftRight', dataDTSecondSet, pipeline, params_to_try)
+    GraphTree(DTleftRightSecond, featuresSecond, 'leftRightDTSecond.png')
+    DTfrontBackSecond, x_trainFBSecond, y_trainFBSecond, x_testFBSecond, y_testFBSecond = BuildDT('frontBack', dataDTSecondSet, pipeline, params_to_try)
+    GraphTree(DTfrontBackSecond, featuresSecond, 'frontBackDTSecond.png')
+    DTangularSecond, x_trainASecond, y_trainASecond, x_testASecond, y_testASecond = BuildDT('angular', dataDTSecondSet, pipeline, params_to_try)
+    GraphTree(DTangularSecond, featuresSecond, 'angularDTSecond.png')
 
 
 
