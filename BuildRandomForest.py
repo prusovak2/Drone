@@ -61,10 +61,10 @@ def GetBestParamsRandomSearch(x_train, y_train):
 	return rf_random.best_estimator_
 
 
-def GetBestParamsGridSearch(paramGridBasedOnRandomSearch, labelColumnName, dataMatrix):
+def GetBestParamsGridSearch(paramGridBasedOnRandomSearch, x_train, y_train):
 	grid_search = GridSearchCV(estimator=rf, param_grid=paramGridBasedOnRandomSearch,
 							   cv=3, n_jobs=-1, verbose=2)
-	grid_search = FitRF(labelColumnName, dataMatrix, grid_search)
+	grid_search = FitRF(x_train, y_train, grid_search)
 	pprint(grid_search.best_params_)
 	return grid_search.best_estimator_
 
@@ -107,12 +107,12 @@ if __name__ == "__main__":
 	RandomRandomForest = RandomForestClassifier(n_estimators=800, bootstrap=True, max_depth=30, max_features='auto',
 									min_samples_leaf=2, min_samples_split=2)
 	RandomRandomForest = FitRF(X, y, RandomRandomForest)
-	CreateConfusionMatrix('leftRight', dataForCM, RandomRandomForest, "BestEstimatorRandom", plt.cm.Reds)
+	CreateConfusionMatrix('leftRight', dataForCM, RandomRandomForest, "BestEstimatorRandomLR", plt.cm.Reds)
 
 	# create random forest with default parameters for comparison
 	basicForest = RandomForestClassifier()
 	basicForest = FitRF(X, y, basicForest)
-	CreateConfusionMatrix('leftRight', dataForCM, basicForest, "BasicForestMatrix", plt.cm.Reds)
+	CreateConfusionMatrix('leftRight', dataForCM, basicForest, "BasicForestMatrixLR", plt.cm.Reds)
 
 	# param grid based on params estimated by random search
 	param_grid = {
@@ -142,54 +142,103 @@ if __name__ == "__main__":
 	gridSearchRandomForest = RandomForestClassifier(n_estimators=400, bootstrap=True, max_depth=30, max_features=3,
 									min_samples_leaf=2, min_samples_split=3)
 	gridSearchRandomForest = FitRF(X,y,gridSearchRandomForest)
-	CreateConfusionMatrix('leftRight', dataForCM, gridSearchRandomForest, "GridSearchForestMatrix", plt.cm.Reds)
+	CreateConfusionMatrix('leftRight', dataForCM, gridSearchRandomForest, "GridSearchForestMatrixLeftRight", plt.cm.Reds)
+
+	# ########################################## FRONT BACK ##################################
+	# estimate some value of hyperparameters
+	X, y = GetLabelAndFeatureData('frontBack', dataForRF)
+	#bestEstimatorRandom = GetBestParamsRandomSearch(X, y)
+	"""
+	BEST PARAMS PROVIDED BY RANDOM SEARCH
+	{'bootstrap': False,
+	 'max_depth': 20,
+	 'max_features': 'auto',
+	 'min_samples_leaf': 2,
+	 'min_samples_split': 5,
+	 'n_estimators': 2000}
+	"""
+	RandomRandomForest = RandomForestClassifier(n_estimators=2000, bootstrap=False, max_depth=20, max_features='auto',
+									min_samples_leaf=2, min_samples_split=5)
+	RandomRandomForest = FitRF(X, y, RandomRandomForest)
+	CreateConfusionMatrix('frontBack', dataForCM, RandomRandomForest, "BestEstimatorRandomFB", plt.cm.Reds)
+
+	# create random forest with default parameters for comparison
+	basicForest = RandomForestClassifier()
+	basicForest = FitRF(X, y, basicForest)
+	CreateConfusionMatrix('frontBack', dataForCM, basicForest, "BasicForestMatrixFB", plt.cm.Reds)
+
+	# param grid based on params estimated by random search
+	param_grid = {
+		'bootstrap': [False],
+		'max_depth': [10, 20, 30],
+		'max_features': [2, 3, 4],
+		'min_samples_leaf': [1, 2, 3],
+		'min_samples_split': [4, 5, 6],
+		'n_estimators': [400, 600, 800, 1000]
+	}
+
+	#grid_search_best_estimator = GetBestParamsGridSearch(param_grid, X, y)
+	"""
+	{'bootstrap': False,
+	 'max_depth': 10,
+	 'max_features': 2,
+	 'min_samples_leaf': 1,
+	 'min_samples_split': 4,
+	 'n_estimators': 600}
+	"""
+	# create RANDOM FOREST WITH THE BEST VERSION OF PARAMETERS FOR FRONT BACK
+	gridSearchRandomForest = RandomForestClassifier(n_estimators=600, bootstrap=False, max_depth=10, max_features=2,
+									min_samples_leaf=1, min_samples_split=4)
+	gridSearchRandomForest = FitRF(X, y, gridSearchRandomForest)
+	CreateConfusionMatrix('frontBack', dataForCM, gridSearchRandomForest, "GridSearchForestMatrixFrontBack", plt.cm.Reds)
+
+	# ########################################## ANGULAR ##################################
+	# estimate some value of hyperparameters
+	X, y = GetLabelAndFeatureData('angular', dataForRF)
+	# bestEstimatorRandom = GetBestParamsRandomSearch(X, y)
+	"""
+	BEST PARAMS
+	{'bootstrap': False,
+	 'max_depth': 30,
+	 'max_features': 'sqrt',
+	 'min_samples_leaf': 4,
+	 'min_samples_split': 5,
+	 'n_estimators': 200}
+	"""
+	RandomRandomForest = RandomForestClassifier(n_estimators=200, bootstrap=False, max_depth=30, max_features='sqrt',
+												min_samples_leaf=4, min_samples_split=5)
+	RandomRandomForest = FitRF(X, y, RandomRandomForest)
+	CreateConfusionMatrix('angular', dataForCM, RandomRandomForest, "BestEstimatorRandomA", plt.cm.Reds)
+
+	# create random forest with default parameters for comparison
+	basicForest = RandomForestClassifier()
+	basicForest = FitRF(X, y, basicForest)
+	CreateConfusionMatrix('angular', dataForCM, basicForest, "BasicForestMatrixA", plt.cm.Reds)
+
+	# param grid based on params estimated by random search
+	param_grid = {
+		'bootstrap': [False],
+		'max_depth': [20, 30, 40],
+		'max_features': [2, 3, 4],
+		'min_samples_leaf': [3, 4, 5],
+		'min_samples_split': [4, 5, 6],
+		'n_estimators': [100, 200, 400]
+	}
+
+	# grid_search_best_estimator = GetBestParamsGridSearch(param_grid, X, y)
+	"""
+	{'bootstrap': False,
+	 'max_depth': 20,
+	 'max_features': 2,
+	 'min_samples_leaf': 4,
+	 'min_samples_split': 4,
+	 'n_estimators': 100}
+	"""
+	# create RANDOM FOREST WITH THE BEST VERSION OF PARAMETERS FOR FRONT BACK
+	gridSearchRandomForest = RandomForestClassifier(n_estimators=100, bootstrap=False, max_depth=20, max_features=2,
+													min_samples_leaf=4, min_samples_split=4)
+	gridSearchRandomForest = FitRF(X, y, gridSearchRandomForest)
+	CreateConfusionMatrix('angular', dataForCM, gridSearchRandomForest, "GridSearchForestMatrixAngular",
+						  plt.cm.Reds)
 
 
-
-"""
-forest = RandomForestClassifier(n_estimators=400, bootstrap=True, max_depth=30, max_features='sqrt',
-									min_samples_leaf=1, min_samples_split=5)
-forest = FitRF('leftRight', dataForRF, forest)
-CreateConfusionMatrix('leftRight', dataForCM, forest, "randomForestMatrix", plt.cm.Reds)
-
-basicForest = RandomForestClassifier()
-basicForest = FitRF('leftRight', dataForRF, basicForest)
-CreateConfusionMatrix('leftRight', dataForCM, basicForest, "BasicForestMatrix", plt.cm.Reds)
-
-# Create the parameter grid based on the results of random search
-param_grid = {
-    'bootstrap': [True],
-    'max_depth': [20, 30, 40],
-    'max_features': [2,3,4],
-    'min_samples_leaf': [1, 2, 3],
-    'min_samples_split': [3,5,7],
-    'n_estimators': [100, 200, 300, 1000]
-}# Create a based model
-rf = RandomForestClassifier()
-# Instantiate the grid search model
-grid_search = GridSearchCV(estimator=rf, param_grid=param_grid,
-                          cv = 3, n_jobs=-1, verbose = 2)
-
-CreateConfusionMatrix('leftRight', dataForCM, grid_search.best_estimator_, "GridSearchForestMatrix", plt.cm.Reds)
-"""
-
-
-
-"""
-BEST PARAMS
-{'bootstrap': True,
- 'max_depth': 30,
- 'max_features': 'sqrt',
- 'min_samples_leaf': 1,
- 'min_samples_split': 5,
- 'n_estimators': 400}
-"""
-"""
-BEST PARAMS
-{'bootstrap': False,
- 'max_depth': 90,
- 'max_features': 'auto',
- 'min_samples_leaf': 4,
- 'min_samples_split': 10,
- 'n_estimators': 800}
-"""
