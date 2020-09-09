@@ -9,6 +9,8 @@ from pprint import pprint
 from sklearn import svm, datasets
 
 from CreateDataMatrixForDT import dataDTSecondSet as dataForSVM
+from CreateDataMatrixForDT import dataForDTRealImagFrozenDict as dataForSVMOlder
+from CreateDataMatrixForDT import dataDTSecondCM as dataForCMSecond
 from ConfusionMatrix import CreateConfusionMatrix
 from CreateDataMatrixForDT import dataForCM
 from BuildDT import GetLabel
@@ -76,19 +78,16 @@ if __name__ == "__main__":
 	angularEstimator, angularScaler = TuneParamsForSVM('angular', dataForSVM)
 	CreateConfusionMatrix('angular', dataForCM, angularEstimator, 'angularSVM', plt.cm.Reds, angularScaler)
 
+	leftRightEstimator, leftRightScaler = TuneParamsForSVM('leftRight', dataForSVMOlder)
+	CreateConfusionMatrix('leftRight', dataForCMSecond, leftRightEstimator, 'leftRightSVMOlderData', plt.cm.Reds, leftRightScaler)
+
+	frontBackEstimator, frontBackScaler = TuneParamsForSVM('frontBack', dataForSVMOlder)
+	CreateConfusionMatrix('frontBack', dataForCMSecond, frontBackEstimator, 'frontBackSVMOlderData', plt.cm.Reds, frontBackScaler)
+
+	angularEstimator, angularScaler = TuneParamsForSVM('angular', dataForSVMOlder)
+	CreateConfusionMatrix('angular', dataForCMSecond, angularEstimator, 'angularSVMOlderData', plt.cm.Reds, angularScaler)
 
 
-"""
-# import some data to play with
-iris = datasets.load_iris()
-X = iris.data[:, :2] # we only take the first two features. We could
-# avoid this ugly slicing by using a two-dim dataset
-y = iris.target
-kernels = ['linear', 'rbf', 'poly']
-for kernel in kernels:
-	svc = svm.SVC(kernel=kernel).fit(X, y)
-	plotSVC('kernel=' + str(kernel))
-"""
 
 
 
