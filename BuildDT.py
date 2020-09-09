@@ -62,7 +62,8 @@ def CrossValidation(pipeline, params_to_try, x_train, y_train, x_test, y_test):
             DT_maxDepth = bestParams['decisionTree__max_depth']
     return {'DT_criterion': DT_criterion, 'DT_maxDepth': DT_maxDepth}
 
-def BuildDT(labelColumn, dataMatrix, pipeline, params_to_try):
+
+def BuildDT(labelColumn, dataMatrix):
     '''
     for a given label column tries to determine the best decision tree parameters via 3,4 and 5 cross validation
     then builds a decision tree with the best parameters found
@@ -76,8 +77,22 @@ def BuildDT(labelColumn, dataMatrix, pipeline, params_to_try):
     labels = GetLabel(labelColumn, dataMatrix)
     features = GetFeatures(dataMatrix)
 
+    # prepare pipeline, that carries out a data standartization - to make a features have a variance in a same order
+    # and creates DT
+    scaler = StandardScaler()
+    pipe_steps = [('scaler', scaler), ('decisionTree', DecisionTreeClassifier())]
+    pipeline = Pipeline(pipe_steps)
+    print(pipeline)
+    print(pipeline.get_params().keys())
+
+    # DT attributes I wanna estimate - are there any other?
+    params_to_try = {'decisionTree__criterion': ['gini', 'entropy'],
+                     'decisionTree__max_depth': np.arange(3, 15)}
+    # np.arange(3, 15): totally random estimation of max tree depth taken from a tutorial. I have no clue whether it
+    # makes sense in this case!!
+
     # split data to training and testing part
-    x_train, x_test, y_train, y_test = train_test_split(features, labels, test_size=0.20, stratify=labels) # random_state = 42 to get the same result each time
+    x_train, x_test, y_train, y_test = train_test_split(features, labels, test_size=0.20, stratify=labels, random_state=66) # random_state = 42 to get the same result each time
     print("num of training samples: ", len(x_train))
     print("num of test samples: ", len(y_test))
 
@@ -87,6 +102,7 @@ def BuildDT(labelColumn, dataMatrix, pipeline, params_to_try):
     # build DT
     decisionTree = DecisionTreeClassifier(criterion=bestParams['DT_criterion'], max_depth=bestParams['DT_maxDepth'])
     decisionTree.fit(x_train, y_train)
+    scaler = StandardScaler()
 
     return decisionTree, x_train, y_train, x_test, y_test
 
@@ -119,36 +135,23 @@ def GraphTree(decisionTree, features, pngFileName):
 
 if __name__ == "__main__":
     dataForDT = dataForDTRealImagFrozenDict
-    # prepare pipeline, that carries out a data standartization - to make a features have a variance in a same order
-    # and creates DT
-    scaler = StandardScaler()
-    pipe_steps = [('scaler', scaler), ('decisionTree', DecisionTreeClassifier())]
-    pipeline = Pipeline(pipe_steps)
-    print(pipeline)
-    print(pipeline.get_params().keys())
-
-    # DT attributes I wanna estimate - are there any other?
-    params_to_try = {'decisionTree__criterion': ['gini', 'entropy'],
-                     'decisionTree__max_depth': np.arange(3, 15)}
-    # np.arange(3, 15): totally random estimation of max tree depth taken from a tutorial. I have no clue whether it
-    # makes sense in this case!!
 
     # build and graph decision trees
     features = GetFeatures(dataForDT)
-    DTleftRight, x_trainLR, y_trainLR, x_testLR, y_testLR = BuildDT('leftRight', dataForDT, pipeline, params_to_try)
+    DTleftRight, x_trainLR, y_trainLR, x_testLR, y_testLR = BuildDT('leftRight', dataForDT)
     GraphTree(DTleftRight, features, 'leftRightDT.png')
-    DTfrontBack, x_trainFB, y_trainFB, x_testFB, y_testFB = BuildDT('frontBack', dataForDT, pipeline, params_to_try)
+    DTfrontBack, x_trainFB, y_trainFB, x_testFB, y_testFB = BuildDT('frontBack', dataForDT)
     GraphTree(DTfrontBack, features, 'frontBackDT.png')
-    DTangular, x_trainA, y_trainA, x_testA, y_testA = BuildDT('angular', dataForDT, pipeline, params_to_try)
+    DTangular, x_trainA, y_trainA, x_testA, y_testA = BuildDT('angular', dataForDT)
     GraphTree(DTangular, features, 'angularDT.png')
 
     # build and graph decision trees based on the second data set
     featuresSecond = GetFeatures(dataDTSecondSet)
-    DTleftRightSecond, x_trainLRSecond, y_trainLRSecond, x_testLRSecond, y_testLRSecond = BuildDT('leftRight', dataDTSecondSet, pipeline, params_to_try)
+    DTleftRightSecond, x_trainLRSecond, y_trainLRSecond, x_testLRSecond, y_testLRSecond = BuildDT('leftRight', dataDTSecondSet)
     GraphTree(DTleftRightSecond, featuresSecond, 'leftRightDTSecond.png')
-    DTfrontBackSecond, x_trainFBSecond, y_trainFBSecond, x_testFBSecond, y_testFBSecond = BuildDT('frontBack', dataDTSecondSet, pipeline, params_to_try)
+    DTfrontBackSecond, x_trainFBSecond, y_trainFBSecond, x_testFBSecond, y_testFBSecond = BuildDT('frontBack', dataDTSecondSet)
     GraphTree(DTfrontBackSecond, featuresSecond, 'frontBackDTSecond.png')
-    DTangularSecond, x_trainASecond, y_trainASecond, x_testASecond, y_testASecond = BuildDT('angular', dataDTSecondSet, pipeline, params_to_try)
+    DTangularSecond, x_trainASecond, y_trainASecond, x_testASecond, y_testASecond = BuildDT('angular', dataDTSecondSet)
     GraphTree(DTangularSecond, featuresSecond, 'angularDTSecond.png')
 
 
