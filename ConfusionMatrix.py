@@ -37,6 +37,7 @@ def CreateConfusionMatrix(labelColumnName, validationDataMatrix, decisionTree, c
     print(cmTitle)
     print(disp.confusion_matrix)
     plt.show()
+    return features
 
 
 if __name__ == "__main__":

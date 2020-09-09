@@ -1,0 +1,16 @@
+
+IntervalLen: 40, representant sample 0leftRightdecision tree score is 0.69
+SVM score is 0.63
+IntervalLen: 40, representant sample 0frontBackdecision tree score is 0.55
+SVM score is 0.45
+IntervalLen: 40, representant sample 0angulardecision tree score is 0.75
+SVM score is 0.47
+IntervalLen: 40, representant sample 0 leftRight
+decision tree score is 0.73
+SVM score is 0.63
+IntervalLen: 40, representant sample 0 frontBack
+decision tree score is 0.84
+SVM score is 0.45
+IntervalLen: 40, representant sample 0 angular
+decision tree score is 0.75
+SVM score is 0.47

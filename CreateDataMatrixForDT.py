@@ -306,6 +306,8 @@ dataDTSecondCM = CreateDataFrameForDTMatrix(inputDFmerged=mergedSecondCM, Column
                                        intervalLen=40)
 dataDTSecondCM.to_csv('OutputStages\\dataDTSecondCM.tsv', sep='\t')
 
+
+# USELESS - too few samples
 leftRightData = CreateDataFrameForDTMatrix(inputDFmerged=mergedLeftRight, ColumnNames=dataColumnNamesRealImag,
                                        functionToCreateContend=CreateDataWithRealAndImagPart,
                                        functionToDiscreteCmds=MakeCMDsDiscreteWithFrozenDict,
