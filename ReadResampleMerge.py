@@ -97,27 +97,37 @@ def addTabs(filename, outputFile):
             for line in input:
                 output.write('\t'+line)
 
+# dataForDTRealImagFrozenDict
 merged = ReadResampleMerge('InputData\\commands.tsv', 'InputData\\navdata.tsv', '50ms', 'OutputStages\\resampledCmds.tsv',
                            'OutputStages\\resampledNav.tsv', "OutputStages\\mergedResampled.tsv")
 
+# DataForCM
 # for some reason, a column of tabs is expected at the beginning of navdata file otherwise it cannot be parsed validly
 # add that column to navdataCM.tsv file
 addTabs('InputData\\navdataCM.tsv', 'InputData\\navdataCMTABS.tsv')
 
 mergedCM = ReadResampleMerge('InputData\\commandsCM.tsv', 'InputData\\navdataCMTABS.tsv', '50ms', 'OutputStages\\resampledCmdsCM.tsv',
                            'OutputStages\\resampledNavCM.tsv', "OutputStages\\mergedResampledCM.tsv")
-
+# DataDTSecondSet
 addTabs('InputData\\navdataSecondSet.tsv', 'InputData\\navdataSecondSetTABS.tsv')
 
 mergedSecondSet = ReadResampleMerge('InputData\\cmdsSecondSet.tsv', 'InputData\\navdataSecondSetTABS.tsv', '50ms',
                                 'OutputStages\\resampledCmdsSecondSet.tsv', 'OutputStages\\resampledNavSecondSet.tsv',
                                 'OutputStages\\mergedResampledSecondSet.tsv')
 
+# DataForCMSecondSet
 addTabs('InputData\\navdataSecondCM.tsv', 'InputData\\navdataSecondCMTABS.tsv')
 
 mergedSecondCM = ReadResampleMerge('InputData\\cmdsSecondCM.tsv', 'InputData\\navdataSecondCMTABS.tsv', '50ms',
                                 'OutputStages\\resampledCmdsSecondCM.tsv', 'OutputStages\\resampledNavSecondCM.tsv',
                               'OutputStages\\mergedResampledSecondCM.tsv')
+
+# DataForCMSecondSet
+addTabs('InputData\\leftRightNavdata.tsv', 'InputData\\leftRightNavdataTABS.tsv')
+
+mergedLeftRight = ReadResampleMerge('InputData\\leftRightCMDS.tsv', 'InputData\\leftRightNavdataTABS.tsv', '50ms',
+                                'OutputStages\\resampledLeftRightCMDS.tsv', 'OutputStages\\resampledLeftRightNAV.tsv',
+                              'OutputStages\\mergedResampledLeftRight.tsv')
 # TODO: after this outputDF is indexed by senceless dates begginning with start of unix date - does it make any sence?
 # TODO: can I somehow format string representation of values in particular columns while printing them to file by to_scv
 # TODO: to print 'time' in some meaningfull format
