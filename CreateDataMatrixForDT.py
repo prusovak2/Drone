@@ -5,6 +5,7 @@ from ReadResampleMerge import merged
 from ReadResampleMerge import mergedCM
 from ReadResampleMerge import mergedSecondSet
 from ReadResampleMerge import mergedSecondCM
+from ReadResampleMerge import mergedLeftRight
 
 def CreateEmptyDataFrame(intervalLen, intIndexedDF, dataColumnNames):
     '''
@@ -304,5 +305,11 @@ dataDTSecondCM = CreateDataFrameForDTMatrix(inputDFmerged=mergedSecondCM, Column
                                        functionToDiscreteCmds=MakeCMDsDiscreteWithFrozenDict,
                                        intervalLen=40)
 dataDTSecondSet.to_csv('OutputStages\\dataDTSecondCM.tsv', sep='\t')
+
+leftRightData = CreateDataFrameForDTMatrix(inputDFmerged=mergedLeftRight, ColumnNames=dataColumnNamesRealImag,
+                                       functionToCreateContend=CreateDataWithRealAndImagPart,
+                                       functionToDiscreteCmds=MakeCMDsDiscreteWithFrozenDict,
+                                       intervalLen=40)
+dataDTSecondSet.to_csv('OutputStages\\leftRightData.tsv', sep='\t')
 
 

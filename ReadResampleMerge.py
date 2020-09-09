@@ -128,7 +128,5 @@ addTabs('InputData\\leftRightNavdata.tsv', 'InputData\\leftRightNavdataTABS.tsv'
 mergedLeftRight = ReadResampleMerge('InputData\\leftRightCMDS.tsv', 'InputData\\leftRightNavdataTABS.tsv', '50ms',
                                 'OutputStages\\resampledLeftRightCMDS.tsv', 'OutputStages\\resampledLeftRightNAV.tsv',
                               'OutputStages\\mergedResampledLeftRight.tsv')
-# TODO: after this outputDF is indexed by senceless dates begginning with start of unix date - does it make any sence?
-# TODO: can I somehow format string representation of values in particular columns while printing them to file by to_scv
-# TODO: to print 'time' in some meaningfull format
+
 
