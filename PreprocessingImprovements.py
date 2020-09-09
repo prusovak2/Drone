@@ -4,6 +4,7 @@ from BuildDT import GetFeatures, GetLabel
 from CreateDataMatrixForDT import dataForDTRealImagFrozenDict as dataForModel
 from BuildRandomForest import GetLabelAndFeatureData
 from CreateDataMatrixForDT import dataForCM
+from CreateDataMatrixForDT import CreateDataFrameForDTMatrixShift, merged
 from SupportVectorMachines import TuneParamsForSVM
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
@@ -20,7 +21,7 @@ def ScoreModelScaledFeatures(labelColumnName, model, dataForCM, scaledFeatures):
 
 def EvaluateModels(labelColumnName, dataForModel, dataForCM, CMColor, specification, outputFile):
 	decisionTree, x_train, y_train, x_test, y_test = BuildDT(labelColumnName, dataForModel)
-	CreateConfusionMatrix(labelColumnName, dataForCM, decisionTree, "decisionTreeCM "+ labelColumnName, CMColor)
+	CreateConfusionMatrix(labelColumnName, dataForCM, decisionTree, "decisionTreeCM " + labelColumnName, CMColor)
 	DTscore = ScoreModel(labelColumnName,decisionTree,dataForCM)
 	print(specification)
 	print('decision tree score is %3.2f' % DTscore)
@@ -38,7 +39,20 @@ def EvaluateModels(labelColumnName, dataForModel, dataForCM, CMColor, specificat
 	return DTscore, SVMScore
 
 
+bestDTscore = 0
+bestSVMscore = 0
 labels = ['leftRight', 'frontBack', 'angular']
-for label in labels:
-	EvaluateModels(label, dataForModel, dataForCM, plt.cm.Blues, "IntervalLen: 40, representant sample 0 ",'OutputStages\\scores.txt')
-
+for shift in range(0, 21):
+	shifted = CreateDataFrameForDTMatrixShift(inputDFmerged=merged, intervalLen=40,
+											  representantSampleShift=shift)
+	DTscore, SVMscore = EvaluateModels('leftRight', dataForModel, dataForCM, plt.cm.Blues, "IntervalLen: 40, representant sample "+str(shift),'OutputStages\\scoresShiftLeftRight.txt')
+	if DTscore > bestDTscore:
+		bestDTscore =DTscore
+		bestDTShift =shift
+	if SVMscore > bestSVMscore:
+		bestSVMscore =SVMscore
+		bestSVMshift = shift
+print('bestDTscore' + str(bestDTscore))
+print('bestDTshift' + str(bestDTShift))
+print('bestSVMscore' + str(bestSVMscore))
+print('bestSVMshift' + str(bestSVMshift))
