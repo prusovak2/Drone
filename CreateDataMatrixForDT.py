@@ -36,6 +36,31 @@ def CreateEmptyDataFrame(intervalLen, intIndexedDF, dataColumnNames):
     return dataForDT
 
 
+def CreateEmptyDataFrameWithShift(intervalLen, intIndexedDF, dataColumnNames, representantShift):
+    if representantShift >= intervalLen:
+        raise AttributeError
+    # prepare indices for a new dataframe
+    indexOfNexDF = list()
+    startIdicesOfIntervals = list()
+    indexIterator = 0  # int, counts rows
+    while (indexIterator + representantShift) < intIndexedDF.index.size:
+        # time from the row corresponding to index iterator - STARTING point of the interval
+        indexOfNexDF.append(intIndexedDF.time.iloc[indexIterator+representantShift])
+        # TODO: will this work even thou its not a datetime?
+        startIdicesOfIntervals.append(intIndexedDF.time.iloc[indexIterator])
+        # move by intervalLen number of rows ahead
+        indexIterator += intervalLen
+    #print(indexOfNexDF)
+    #print(indexIterator)
+
+    # create an empty dataframe
+    dataForDT = pd.DataFrame(columns=dataColumnNames, index=indexOfNexDF)
+    # interpret ind as a time (it is a time)
+    dataForDT.index = pd.to_datetime(dataForDT.index, unit='ms')
+    dataForDT.index.name = 'time'
+    return dataForDT, startIdicesOfIntervals
+
+
 def MakeCMDsDiscrete(index, inputDF, outputDF):
     '''
     gain discrete value of CMDs on given index
@@ -249,6 +274,20 @@ def CreateDataFrameForDTMatrix(inputDFmerged, ColumnNames, functionToCreateConte
     return newDF
 
 
+def CreateDataFrameForDTMatrixShift(inputDFmerged, ColumnNames, intervalLen=40, representantSampleShift=0):
+    intIndexed = inputDFmerged.reset_index()
+    newDF, startOfIntervalIndices = CreateEmptyDataFrameWithShift(intervalLen, intIndexed, ColumnNames, representantSampleShift)
+
+    # fill dataFrame with data
+    indexIterator = 0
+    for index in newDF.index:
+        MakeCMDsDiscreteWithFrozenDict(index, inputDFmerged, newDF)
+        CreateDataWithRealAndImagPart(index, indexIterator, intervalLen, inputDF=inputDFmerged, outputDF=newDF)
+        indexIterator += intervalLen
+
+    return newDF
+
+
 
 
 '''
@@ -287,6 +326,11 @@ dataForDTRealImagFrozenDict = CreateDataFrameForDTMatrix(inputDFmerged=merged, C
                                                          functionToDiscreteCmds=MakeCMDsDiscreteWithFrozenDict,
                                                          intervalLen=40)
 dataForDTRealImagFrozenDict.to_csv('OutputStages\\dataForDTRealImagFrozenDict.tsv', sep='\t')
+
+shifted = CreateDataFrameForDTMatrixShift(inputDFmerged=merged, ColumnNames=dataColumnNamesRealImag)
+shifted.to_csv('OutputStages\\shiftedData.tsv', sep='\t')
+
+
 # new data for Confusion Matrix - evaluation of DT
 dataForCM = CreateDataFrameForDTMatrix(inputDFmerged=mergedCM, ColumnNames=dataColumnNamesRealImag,
                                        functionToCreateContend=CreateDataWithRealAndImagPart,
