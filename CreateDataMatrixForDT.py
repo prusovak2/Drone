@@ -328,7 +328,7 @@ dataForDTRealImagFrozenDict = CreateDataFrameForDTMatrix(inputDFmerged=merged, C
 dataForDTRealImagFrozenDict.to_csv('OutputStages\\dataForDTRealImagFrozenDict.tsv', sep='\t')
 
 shifted = CreateDataFrameForDTMatrixShift(inputDFmerged=merged, ColumnNames=dataColumnNamesRealImag)
-shifted.to_csv('OutputStages\\shiftedData.tsv', sep='\t')
+shifted.to_csv('OutputStages\\shifted0Data.tsv', sep='\t')
 
 
 # new data for Confusion Matrix - evaluation of DT
@@ -359,3 +359,5 @@ leftRightData = CreateDataFrameForDTMatrix(inputDFmerged=mergedLeftRight, Column
 leftRightData.to_csv('OutputStages\\leftRightData.tsv', sep='\t')
 
 
+shifted = CreateDataFrameForDTMatrixShift(inputDFmerged=merged, ColumnNames=dataColumnNamesRealImag, intervalLen=40,representantSampleShift=5)
+shifted.to_csv('OutputStages\\shifted5Data.tsv', sep='\t')
