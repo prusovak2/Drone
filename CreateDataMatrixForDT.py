@@ -19,7 +19,7 @@ def CreateEmptyDataFrame(intervalLen, intIndexedDF, dataColumnNames):
     # intervalLen = 40
     # prepare indices for a new dataframe
     ind = list()
-    indexIterator = 0 # int, counts rows
+    indexIterator = 0  # int, counts rows
     while indexIterator < intIndexedDF.index.size:
         # time from the row corresponding to index iterator - STARTING point of the interval
         ind.append(intIndexedDF.time.iloc[indexIterator])
@@ -304,12 +304,12 @@ dataDTSecondCM = CreateDataFrameForDTMatrix(inputDFmerged=mergedSecondCM, Column
                                        functionToCreateContend=CreateDataWithRealAndImagPart,
                                        functionToDiscreteCmds=MakeCMDsDiscreteWithFrozenDict,
                                        intervalLen=40)
-dataDTSecondSet.to_csv('OutputStages\\dataDTSecondCM.tsv', sep='\t')
+dataDTSecondCM.to_csv('OutputStages\\dataDTSecondCM.tsv', sep='\t')
 
 leftRightData = CreateDataFrameForDTMatrix(inputDFmerged=mergedLeftRight, ColumnNames=dataColumnNamesRealImag,
                                        functionToCreateContend=CreateDataWithRealAndImagPart,
                                        functionToDiscreteCmds=MakeCMDsDiscreteWithFrozenDict,
-                                       intervalLen=40)
-dataDTSecondSet.to_csv('OutputStages\\leftRightData.tsv', sep='\t')
+                                       intervalLen=20)
+leftRightData.to_csv('OutputStages\\leftRightData.tsv', sep='\t')
 
 
