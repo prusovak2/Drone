@@ -11,7 +11,7 @@ from CreateDataMatrixForDT import dataDTSecondCM
 
 
 # TODO: standartisation of cm data? if so, how?
-def CreateConfusionMatrix(labelColumnName, validationDataMatrix, decisionTree, cmTitle, color):
+def CreateConfusionMatrix(labelColumnName, validationDataMatrix, decisionTree, cmTitle, color, scaler=None):
     '''
     for given decision tree creates a confusion matrix showing how well DT performs while predicting
     labels from validationDataMatrix Dt was not trained on
@@ -23,7 +23,9 @@ def CreateConfusionMatrix(labelColumnName, validationDataMatrix, decisionTree, c
     '''
     realLabels = bdt.GetLabel(labelColumnName, validationDataMatrix)
     features = bdt.GetFeatures(validationDataMatrix)
-    predictedLabels = decisionTree.predict(features)
+    if scaler is not None:
+        features = scaler.transform(features)
+    # predictedLabels = decisionTree.predict(features)
     # if labelColumnName == 'leftRight':
     #    features = bdt.scaler.transform(features)
 
