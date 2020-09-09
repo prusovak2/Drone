@@ -51,6 +51,7 @@ def TuneParamsForSVM(labelColoumnName, dataForSVM):
 	scaler = StandardScaler()
 	x_train = scaler.fit_transform(x_train)
 	y_train = np.ravel(y_train)
+	x_test = scaler.transform(x_test)
 
 	score = 0
 	for cv in range(3, 6):
@@ -65,26 +66,28 @@ def TuneParamsForSVM(labelColoumnName, dataForSVM):
 			score = newScore
 			bestParams = currentBestParams
 			bestEstimator = create_grid.best_estimator_
-	return bestEstimator, scaler
+	return bestEstimator, scaler, x_test, y_test
 
 
 if __name__ == "__main__":
-	leftRightEstimator, leftRightScaler = TuneParamsForSVM('leftRight', dataForSVM)
+	leftRightEstimator, leftRightScaler, x_test, y_test = TuneParamsForSVM('leftRight', dataForSVM)
 	CreateConfusionMatrix('leftRight', dataForCM, leftRightEstimator, 'leftRightSVM', plt.cm.Reds, leftRightScaler)
+	newScore = leftRightEstimator.score(x_test, y_test)
+	print("score for is %3.2f" % newScore)
 
-	frontBackEstimator, frontBackScaler = TuneParamsForSVM('frontBack', dataForSVM)
+	frontBackEstimator, frontBackScaler, x_test, y_test= TuneParamsForSVM('frontBack', dataForSVM)
 	CreateConfusionMatrix('frontBack', dataForCM, frontBackEstimator, 'frontBackSVM', plt.cm.Reds, frontBackScaler)
 
-	angularEstimator, angularScaler = TuneParamsForSVM('angular', dataForSVM)
+	angularEstimator, angularScaler,x_test, y_test = TuneParamsForSVM('angular', dataForSVM)
 	CreateConfusionMatrix('angular', dataForCM, angularEstimator, 'angularSVM', plt.cm.Reds, angularScaler)
 
-	leftRightEstimator, leftRightScaler = TuneParamsForSVM('leftRight', dataForSVMOlder)
+	leftRightEstimator, leftRightScaler,x_test, y_test = TuneParamsForSVM('leftRight', dataForSVMOlder)
 	CreateConfusionMatrix('leftRight', dataForCMSecond, leftRightEstimator, 'leftRightSVMOlderData', plt.cm.Reds, leftRightScaler)
 
-	frontBackEstimator, frontBackScaler = TuneParamsForSVM('frontBack', dataForSVMOlder)
+	frontBackEstimator, frontBackScaler,x_test, y_test = TuneParamsForSVM('frontBack', dataForSVMOlder)
 	CreateConfusionMatrix('frontBack', dataForCMSecond, frontBackEstimator, 'frontBackSVMOlderData', plt.cm.Reds, frontBackScaler)
 
-	angularEstimator, angularScaler = TuneParamsForSVM('angular', dataForSVMOlder)
+	angularEstimator, angularScaler,x_test, y_test = TuneParamsForSVM('angular', dataForSVMOlder)
 	CreateConfusionMatrix('angular', dataForCMSecond, angularEstimator, 'angularSVMOlderData', plt.cm.Reds, angularScaler)
 
 
