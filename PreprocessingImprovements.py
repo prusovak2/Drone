@@ -234,7 +234,7 @@ if __name__ == "__main__":
 	# TryShiftsForOneLabel('frontBack', merged, 'OutputStages\\scoresShiftFrontBack.txt')
 	# TryShiftsForOneLabel('angular', merged, 'OutputStages\\scoresShiftAngular.txt')
 
-	#TryShiftsForAllLabels(merged, 'OutputStages\\scoresShiftAllLabels.txt')
+	TryShiftsForAllLabels(merged, 'OutputStages\\scoresShiftAllLabels.txt')
 
 	#TryIntervalLenghtsOneLabel('leftRight', merged, 'OutputStages\\scoresIntervalLenLeftRight.txt')
-	TryIntervalLensForAllLabels(merged,'OutputStages\\scoresIntervalLenghtsAllLabels.txt')
+	TryIntervalLensForAllLabels(merged, 'OutputStages\\scoresIntervalLenghtsAllLabels.txt')
