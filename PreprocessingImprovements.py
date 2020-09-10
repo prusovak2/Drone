@@ -73,7 +73,7 @@ def TryShiftsForOneLabel(labelColumnName, mergedData,outputFileName, intervalLen
 		return bestDTscore, bestDTShift, bestSVMscore, bestSVMshift
 
 
-def TryShiftsForAllLabel(mergedData, outputFileName, intervalLen=40, lowerShiftBorder=0, upperShiftBorder=20):
+def TryShiftsForAllLabels(mergedData, outputFileName, intervalLen=40, lowerShiftBorder=0, upperShiftBorder=20):
 	with open(outputFileName, "w") as outputFile:
 		bestDTscore = {'leftRight': 0, 'frontBack': 0, 'angular': 0}
 		bestSVMscore = {'leftRight': 0, 'frontBack': 0, 'angular': 0}
@@ -137,8 +137,104 @@ def TryShiftsForAllLabel(mergedData, outputFileName, intervalLen=40, lowerShiftB
 		pprint(bestDTshift, stream=outputFile)
 
 
-# TryShiftsForOneLabel('leftRight', merged, 'OutputStages\\scoresShiftLeftRight.txt')
-# TryShiftsForOneLabel('frontBack', merged, 'OutputStages\\scoresShiftFrontBack.txt')
-# TryShiftsForOneLabel('angular', merged, 'OutputStages\\scoresShiftAngular.txt')
+def TryIntervalLenghtsOneLabel(labelColumnName, mergedData,outputFileName, shift=0, lowerIntearvalLenBorder=20, upperIntervalLenBorder=40):
+	with open(outputFileName, "w") as outputFile:
+		bestDTscore = 0
+		bestSVMscore = 0
+		for intervalLen in range(lowerIntearvalLenBorder, upperIntervalLenBorder + 1):
+			dataMatrix = CreateDataFrameForDTMatrixShift(inputDFmerged=mergedData, intervalLen=intervalLen,
+														representantSampleShift=shift)
+			DTscore, SVMscore = EvaluateModels(labelColumnName, dataMatrix, dataForCM, plt.cm.Blues,
+													"IntervalLen: " + str(intervalLen) + " representant sample " + str(
+													shift) + " ", outputFile, showCM=False)
+			if DTscore > bestDTscore:
+				bestDTscore = DTscore
+				bestDTintervalLen = intervalLen
+			if SVMscore > bestSVMscore:
+				bestSVMscore = SVMscore
+				bestSVMintervalLen = intervalLen
+		print('bestDTscore' + str(bestDTscore))
+		print('bestDT interval len' + str(bestDTintervalLen))
+		print('bestSVMscore' + str(bestSVMscore))
+		print('bestSVM interval len' + str(bestSVMintervalLen))
+		outputFile.write("\n")
+		outputFile.write('bestDTscore ' + str(bestDTscore) + "\n")
+		outputFile.write('bestDTIntervalLen ' + str(bestDTintervalLen) + "\n")
+		outputFile.write('bestSVMscore ' + str(bestSVMscore) + "\n")
+		outputFile.write('bestSVMintervalLen ' + str(bestSVMintervalLen) + "\n")
+		return bestDTscore, bestDTintervalLen, bestSVMscore, bestSVMintervalLen
 
-TryShiftsForAllLabel(merged, 'OutputStages\\scoresShiftAllLabels.txt')
+
+def TryIntervalLensForAllLabels(mergedData, outputFileName, shift=0, lowerIntearvalLenBorder=20, upperIntervalLenBorder=40):
+	with open(outputFileName, "w") as outputFile:
+		bestDTscore = {'leftRight': 0, 'frontBack': 0, 'angular': 0}
+		bestSVMscore = {'leftRight': 0, 'frontBack': 0, 'angular': 0}
+		bestDTintervalLen = {'leftRight': None, 'frontBack': None, 'angular': None}
+		bestSVMintervalLen = {'leftRight': None, 'frontBack': None, 'angular': None}
+		labels = ['leftRight', 'frontBack', 'angular']
+		bestDTscoreAverageLabels = 0
+		bestSVMscoreAverageLabels = 0
+		for intervalLen in range(lowerIntearvalLenBorder, upperIntervalLenBorder + 1):
+			dataMatrix = CreateDataFrameForDTMatrixShift(inputDFmerged=mergedData, intervalLen=intervalLen,
+													  representantSampleShift=shift)
+			DTscore = {'leftRight': 0, 'frontBack': 0, 'angular': 0}
+			SVMscore = {'leftRight': 0, 'frontBack': 0, 'angular': 0}
+			for label in labels:
+				DTscore[label], SVMscore[label] = EvaluateModels(label, dataMatrix, dataForCM, plt.cm.Blues,
+														" IntervalLen: " + str(intervalLen) + " representant sample " + str(
+														shift) + " ", outputFile, showCM=False)
+				if DTscore[label] > bestDTscore[label]:
+					bestDTscore[label] = DTscore[label]
+					bestDTintervalLen[label] = intervalLen
+				if SVMscore[label] > bestSVMscore[label]:
+					bestSVMscore[label] = SVMscore[label]
+					bestSVMintervalLen[label] = intervalLen
+			averageDTscore = (DTscore['leftRight']+DTscore['frontBack'] + DTscore['angular'])/3
+			averageSVMscore = (SVMscore['leftRight']+SVMscore['frontBack'] + SVMscore['angular'])/3
+			outputFile.write('average DT score: ' + str(averageDTscore)+'\n')
+			outputFile.write('average SVM score:' + str(averageSVMscore) + '\n')
+			if averageDTscore > bestDTscoreAverageLabels:
+				bestDTscoreAverageLabels = averageDTscore
+				bestDTAverageIntervalLen = intervalLen
+			if averageSVMscore > bestSVMscoreAverageLabels:
+				bestSVMscoreAverageLabels = averageSVMscore
+				bestSVMaverageIntervalLen = intervalLen
+
+		print('best DT average Score' + str(bestDTscoreAverageLabels))
+		print('best DT averages intervalLen' + str(bestDTAverageIntervalLen))
+		print('best SVM average score' + str(bestSVMscoreAverageLabels))
+		print('best SVM average IntervalLen' + str(bestSVMaverageIntervalLen))
+		outputFile.write("\n")
+		outputFile.write('best DT average Score ' + str(bestDTscoreAverageLabels) + "\n")
+		outputFile.write('best DT averages IntervalLen ' + str(bestDTAverageIntervalLen) + "\n")
+		outputFile.write('best SVM average score ' + str(bestSVMscoreAverageLabels) + "\n")
+		outputFile.write('best SVM average IntervalLen ' + str(bestSVMaverageIntervalLen) + "\n")
+
+		print('bestDTscores:')
+		pprint(bestDTscore)
+		print('bestDTintervalLen:')
+		pprint(bestDTintervalLen)
+		print('bestSVMscores:')
+		pprint(bestSVMscore)
+		print('bestSVMintervalLen:')
+		pprint(bestDTintervalLen)
+
+		outputFile.write('bestDTscores:\n')
+		pprint(bestDTscore, stream=outputFile)
+		outputFile.write('bestDTintervalLen:\n')
+		pprint(bestDTintervalLen, stream=outputFile)
+		outputFile.write('bestSVMscores:\n')
+		pprint(bestSVMscore, stream=outputFile)
+		outputFile.write('bestSVMintervalLen:\n')
+		pprint(bestDTintervalLen, stream=outputFile)
+
+
+if __name__ == "__main__":
+	# TryShiftsForOneLabel('leftRight', merged, 'OutputStages\\scoresShiftLeftRight.txt')
+	# TryShiftsForOneLabel('frontBack', merged, 'OutputStages\\scoresShiftFrontBack.txt')
+	# TryShiftsForOneLabel('angular', merged, 'OutputStages\\scoresShiftAngular.txt')
+
+	#TryShiftsForAllLabels(merged, 'OutputStages\\scoresShiftAllLabels.txt')
+
+	#TryIntervalLenghtsOneLabel('leftRight', merged, 'OutputStages\\scoresIntervalLenLeftRight.txt')
+	TryIntervalLensForAllLabels(merged,'OutputStages\\scoresIntervalLenghtsAllLabels.txt')

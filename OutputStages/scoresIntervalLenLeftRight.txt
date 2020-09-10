@@ -1,0 +1,68 @@
+IntervalLen: 20 representant sample 0 leftRight
+decision tree score is 0.61
+SVM score is 0.63
+IntervalLen: 21 representant sample 0 leftRight
+decision tree score is 0.63
+SVM score is 0.63
+IntervalLen: 22 representant sample 0 leftRight
+decision tree score is 0.59
+SVM score is 0.39
+IntervalLen: 23 representant sample 0 leftRight
+decision tree score is 0.61
+SVM score is 0.63
+IntervalLen: 24 representant sample 0 leftRight
+decision tree score is 0.63
+SVM score is 0.51
+IntervalLen: 25 representant sample 0 leftRight
+decision tree score is 0.63
+SVM score is 0.63
+IntervalLen: 26 representant sample 0 leftRight
+decision tree score is 0.61
+SVM score is 0.63
+IntervalLen: 27 representant sample 0 leftRight
+decision tree score is 0.61
+SVM score is 0.63
+IntervalLen: 28 representant sample 0 leftRight
+decision tree score is 0.67
+SVM score is 0.59
+IntervalLen: 29 representant sample 0 leftRight
+decision tree score is 0.57
+SVM score is 0.63
+IntervalLen: 30 representant sample 0 leftRight
+decision tree score is 0.65
+SVM score is 0.53
+IntervalLen: 31 representant sample 0 leftRight
+decision tree score is 0.63
+SVM score is 0.59
+IntervalLen: 32 representant sample 0 leftRight
+decision tree score is 0.57
+SVM score is 0.63
+IntervalLen: 33 representant sample 0 leftRight
+decision tree score is 0.61
+SVM score is 0.63
+IntervalLen: 34 representant sample 0 leftRight
+decision tree score is 0.55
+SVM score is 0.61
+IntervalLen: 35 representant sample 0 leftRight
+decision tree score is 0.65
+SVM score is 0.63
+IntervalLen: 36 representant sample 0 leftRight
+decision tree score is 0.71
+SVM score is 0.63
+IntervalLen: 37 representant sample 0 leftRight
+decision tree score is 0.65
+SVM score is 0.59
+IntervalLen: 38 representant sample 0 leftRight
+decision tree score is 0.55
+SVM score is 0.63
+IntervalLen: 39 representant sample 0 leftRight
+decision tree score is 0.73
+SVM score is 0.63
+IntervalLen: 40 representant sample 0 leftRight
+decision tree score is 0.73
+SVM score is 0.63
+
+bestDTscore0.7254901960784313
+bestDTIntervalLen39
+bestSVMscore0.6274509803921569
+bestSVMintervalLen20

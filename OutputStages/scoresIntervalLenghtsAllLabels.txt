@@ -1,0 +1,248 @@
+ IntervalLen: 20 representant sample 0 leftRight
+decision tree score is 0.65
+SVM score is 0.63
+ IntervalLen: 20 representant sample 0 frontBack
+decision tree score is 0.53
+SVM score is 0.49
+ IntervalLen: 20 representant sample 0 angular
+decision tree score is 0.73
+SVM score is 0.69
+average DT score: 0.6339869281045751
+average SVM score:0.6013071895424836
+ IntervalLen: 21 representant sample 0 leftRight
+decision tree score is 0.43
+SVM score is 0.63
+ IntervalLen: 21 representant sample 0 frontBack
+decision tree score is 0.55
+SVM score is 0.67
+ IntervalLen: 21 representant sample 0 angular
+decision tree score is 0.71
+SVM score is 0.65
+average DT score: 0.562091503267974
+average SVM score:0.6470588235294117
+ IntervalLen: 22 representant sample 0 leftRight
+decision tree score is 0.61
+SVM score is 0.39
+ IntervalLen: 22 representant sample 0 frontBack
+decision tree score is 0.59
+SVM score is 0.45
+ IntervalLen: 22 representant sample 0 angular
+decision tree score is 0.69
+SVM score is 0.53
+average DT score: 0.6274509803921569
+average SVM score:0.45751633986928103
+ IntervalLen: 23 representant sample 0 leftRight
+decision tree score is 0.59
+SVM score is 0.63
+ IntervalLen: 23 representant sample 0 frontBack
+decision tree score is 0.59
+SVM score is 0.53
+ IntervalLen: 23 representant sample 0 angular
+decision tree score is 0.53
+SVM score is 0.75
+average DT score: 0.5686274509803922
+average SVM score:0.6339869281045751
+ IntervalLen: 24 representant sample 0 leftRight
+decision tree score is 0.63
+SVM score is 0.51
+ IntervalLen: 24 representant sample 0 frontBack
+decision tree score is 0.57
+SVM score is 0.53
+ IntervalLen: 24 representant sample 0 angular
+decision tree score is 0.75
+SVM score is 0.43
+average DT score: 0.6470588235294118
+average SVM score:0.49019607843137253
+ IntervalLen: 25 representant sample 0 leftRight
+decision tree score is 0.61
+SVM score is 0.63
+ IntervalLen: 25 representant sample 0 frontBack
+decision tree score is 0.67
+SVM score is 0.61
+ IntervalLen: 25 representant sample 0 angular
+decision tree score is 0.75
+SVM score is 0.71
+average DT score: 0.6732026143790849
+average SVM score:0.6470588235294118
+ IntervalLen: 26 representant sample 0 leftRight
+decision tree score is 0.61
+SVM score is 0.63
+ IntervalLen: 26 representant sample 0 frontBack
+decision tree score is 0.63
+SVM score is 0.67
+ IntervalLen: 26 representant sample 0 angular
+decision tree score is 0.65
+SVM score is 0.53
+average DT score: 0.6274509803921569
+average SVM score:0.6078431372549019
+ IntervalLen: 27 representant sample 0 leftRight
+decision tree score is 0.63
+SVM score is 0.63
+ IntervalLen: 27 representant sample 0 frontBack
+decision tree score is 0.53
+SVM score is 0.49
+ IntervalLen: 27 representant sample 0 angular
+decision tree score is 0.63
+SVM score is 0.71
+average DT score: 0.5947712418300654
+average SVM score:0.607843137254902
+ IntervalLen: 28 representant sample 0 leftRight
+decision tree score is 0.63
+SVM score is 0.59
+ IntervalLen: 28 representant sample 0 frontBack
+decision tree score is 0.57
+SVM score is 0.67
+ IntervalLen: 28 representant sample 0 angular
+decision tree score is 0.73
+SVM score is 0.59
+average DT score: 0.6405228758169934
+average SVM score:0.6143790849673203
+ IntervalLen: 29 representant sample 0 leftRight
+decision tree score is 0.61
+SVM score is 0.63
+ IntervalLen: 29 representant sample 0 frontBack
+decision tree score is 0.29
+SVM score is 0.80
+ IntervalLen: 29 representant sample 0 angular
+decision tree score is 0.73
+SVM score is 0.75
+average DT score: 0.5424836601307189
+average SVM score:0.7254901960784315
+ IntervalLen: 30 representant sample 0 leftRight
+decision tree score is 0.65
+SVM score is 0.53
+ IntervalLen: 30 representant sample 0 frontBack
+decision tree score is 0.80
+SVM score is 0.45
+ IntervalLen: 30 representant sample 0 angular
+decision tree score is 0.73
+SVM score is 0.45
+average DT score: 0.7254901960784315
+average SVM score:0.477124183006536
+ IntervalLen: 31 representant sample 0 leftRight
+decision tree score is 0.63
+SVM score is 0.59
+ IntervalLen: 31 representant sample 0 frontBack
+decision tree score is 0.53
+SVM score is 0.63
+ IntervalLen: 31 representant sample 0 angular
+decision tree score is 0.75
+SVM score is 0.75
+average DT score: 0.6339869281045751
+average SVM score:0.6535947712418301
+ IntervalLen: 32 representant sample 0 leftRight
+decision tree score is 0.53
+SVM score is 0.63
+ IntervalLen: 32 representant sample 0 frontBack
+decision tree score is 0.88
+SVM score is 0.65
+ IntervalLen: 32 representant sample 0 angular
+decision tree score is 0.75
+SVM score is 0.71
+average DT score: 0.7189542483660131
+average SVM score:0.6601307189542484
+ IntervalLen: 33 representant sample 0 leftRight
+decision tree score is 0.61
+SVM score is 0.63
+ IntervalLen: 33 representant sample 0 frontBack
+decision tree score is 0.63
+SVM score is 0.61
+ IntervalLen: 33 representant sample 0 angular
+decision tree score is 0.75
+SVM score is 0.76
+average DT score: 0.6601307189542484
+average SVM score:0.6666666666666666
+ IntervalLen: 34 representant sample 0 leftRight
+decision tree score is 0.55
+SVM score is 0.61
+ IntervalLen: 34 representant sample 0 frontBack
+decision tree score is 0.88
+SVM score is 0.73
+ IntervalLen: 34 representant sample 0 angular
+decision tree score is 0.75
+SVM score is 0.47
+average DT score: 0.7254901960784315
+average SVM score:0.6013071895424836
+ IntervalLen: 35 representant sample 0 leftRight
+decision tree score is 0.65
+SVM score is 0.63
+ IntervalLen: 35 representant sample 0 frontBack
+decision tree score is 0.55
+SVM score is 0.67
+ IntervalLen: 35 representant sample 0 angular
+decision tree score is 0.65
+SVM score is 0.35
+average DT score: 0.6143790849673203
+average SVM score:0.5490196078431372
+ IntervalLen: 36 representant sample 0 leftRight
+decision tree score is 0.69
+SVM score is 0.63
+ IntervalLen: 36 representant sample 0 frontBack
+decision tree score is 0.61
+SVM score is 0.73
+ IntervalLen: 36 representant sample 0 angular
+decision tree score is 0.76
+SVM score is 0.75
+average DT score: 0.6862745098039215
+average SVM score:0.6993464052287582
+ IntervalLen: 37 representant sample 0 leftRight
+decision tree score is 0.59
+SVM score is 0.59
+ IntervalLen: 37 representant sample 0 frontBack
+decision tree score is 0.61
+SVM score is 0.80
+ IntervalLen: 37 representant sample 0 angular
+decision tree score is 0.75
+SVM score is 0.73
+average DT score: 0.6470588235294118
+average SVM score:0.7058823529411765
+ IntervalLen: 38 representant sample 0 leftRight
+decision tree score is 0.53
+SVM score is 0.63
+ IntervalLen: 38 representant sample 0 frontBack
+decision tree score is 0.55
+SVM score is 0.75
+ IntervalLen: 38 representant sample 0 angular
+decision tree score is 0.73
+SVM score is 0.51
+average DT score: 0.6013071895424837
+average SVM score:0.6274509803921569
+ IntervalLen: 39 representant sample 0 leftRight
+decision tree score is 0.61
+SVM score is 0.63
+ IntervalLen: 39 representant sample 0 frontBack
+decision tree score is 0.53
+SVM score is 0.61
+ IntervalLen: 39 representant sample 0 angular
+decision tree score is 0.76
+SVM score is 0.47
+average DT score: 0.6339869281045751
+average SVM score:0.5686274509803922
+ IntervalLen: 40 representant sample 0 leftRight
+decision tree score is 0.69
+SVM score is 0.63
+ IntervalLen: 40 representant sample 0 frontBack
+decision tree score is 0.55
+SVM score is 0.45
+ IntervalLen: 40 representant sample 0 angular
+decision tree score is 0.75
+SVM score is 0.47
+average DT score: 0.6601307189542484
+average SVM score:0.5163398692810457
+
+best DT average Score 0.7254901960784315
+best DT averages IntervalLen 30
+best SVM average score 0.7254901960784315
+best SVM average IntervalLen 29
+bestDTscores:
+{'angular': 0.7647058823529411,
+ 'frontBack': 0.8823529411764706,
+ 'leftRight': 0.6862745098039216}
+bestDTintervalLen:
+{'angular': 36, 'frontBack': 32, 'leftRight': 36}
+bestSVMscores:
+{'angular': 0.7647058823529411,
+ 'frontBack': 0.803921568627451,
+ 'leftRight': 0.6274509803921569}
+bestSVMintervalLen:
+{'angular': 36, 'frontBack': 32, 'leftRight': 36}
