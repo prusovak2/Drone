@@ -1,0 +1,68 @@
+IntervalLen: 40 representant sample 0 angular
+decision tree score is 0.75
+SVM score is 0.47
+IntervalLen: 40 representant sample 1 angular
+decision tree score is 0.75
+SVM score is 0.47
+IntervalLen: 40 representant sample 2 angular
+decision tree score is 0.75
+SVM score is 0.47
+IntervalLen: 40 representant sample 3 angular
+decision tree score is 0.75
+SVM score is 0.47
+IntervalLen: 40 representant sample 4 angular
+decision tree score is 0.75
+SVM score is 0.47
+IntervalLen: 40 representant sample 5 angular
+decision tree score is 0.75
+SVM score is 0.47
+IntervalLen: 40 representant sample 6 angular
+decision tree score is 0.75
+SVM score is 0.47
+IntervalLen: 40 representant sample 7 angular
+decision tree score is 0.75
+SVM score is 0.41
+IntervalLen: 40 representant sample 8 angular
+decision tree score is 0.75
+SVM score is 0.41
+IntervalLen: 40 representant sample 9 angular
+decision tree score is 0.75
+SVM score is 0.41
+IntervalLen: 40 representant sample 10 angular
+decision tree score is 0.75
+SVM score is 0.41
+IntervalLen: 40 representant sample 11 angular
+decision tree score is 0.75
+SVM score is 0.41
+IntervalLen: 40 representant sample 12 angular
+decision tree score is 0.75
+SVM score is 0.41
+IntervalLen: 40 representant sample 13 angular
+decision tree score is 0.75
+SVM score is 0.41
+IntervalLen: 40 representant sample 14 angular
+decision tree score is 0.75
+SVM score is 0.41
+IntervalLen: 40 representant sample 15 angular
+decision tree score is 0.76
+SVM score is 0.71
+IntervalLen: 40 representant sample 16 angular
+decision tree score is 0.25
+SVM score is 0.71
+IntervalLen: 40 representant sample 17 angular
+decision tree score is 0.25
+SVM score is 0.71
+IntervalLen: 40 representant sample 18 angular
+decision tree score is 0.76
+SVM score is 0.71
+IntervalLen: 40 representant sample 19 angular
+decision tree score is 0.25
+SVM score is 0.71
+IntervalLen: 40 representant sample 20 angular
+decision tree score is 0.76
+SVM score is 0.71
+
+bestDTscore0.7647058823529411
+bestDTshift15
+bestSVMscore0.7058823529411765
+bestSVMshift15

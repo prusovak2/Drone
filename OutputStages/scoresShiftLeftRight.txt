@@ -1,30 +1,68 @@
-IntervalLen: 40, representant sample 0leftRight
-decision tree score is 0.73
-SVM score is 0.63
-IntervalLen: 40, representant sample 1leftRight
-decision tree score is 0.73
-SVM score is 0.63
-IntervalLen: 40, representant sample 2leftRight
-decision tree score is 0.73
-SVM score is 0.63
-IntervalLen: 40, representant sample 3leftRight
-decision tree score is 0.73
-SVM score is 0.63
-IntervalLen: 40, representant sample 4leftRight
-decision tree score is 0.73
-SVM score is 0.63
-IntervalLen: 40, representant sample 5leftRight
-decision tree score is 0.73
-SVM score is 0.63
-IntervalLen: 40, representant sample 6leftRight
+IntervalLen: 40 representant sample 0 leftRight
 decision tree score is 0.69
 SVM score is 0.63
-IntervalLen: 40, representant sample 7leftRight
+IntervalLen: 40 representant sample 1 leftRight
 decision tree score is 0.69
 SVM score is 0.63
-IntervalLen: 40, representant sample 8leftRight
-decision tree score is 0.69
-SVM score is 0.63
-IntervalLen: 40, representant sample 9leftRight
+IntervalLen: 40 representant sample 2 leftRight
 decision tree score is 0.73
 SVM score is 0.63
+IntervalLen: 40 representant sample 3 leftRight
+decision tree score is 0.69
+SVM score is 0.63
+IntervalLen: 40 representant sample 4 leftRight
+decision tree score is 0.73
+SVM score is 0.63
+IntervalLen: 40 representant sample 5 leftRight
+decision tree score is 0.73
+SVM score is 0.63
+IntervalLen: 40 representant sample 6 leftRight
+decision tree score is 0.63
+SVM score is 0.63
+IntervalLen: 40 representant sample 7 leftRight
+decision tree score is 0.73
+SVM score is 0.63
+IntervalLen: 40 representant sample 8 leftRight
+decision tree score is 0.59
+SVM score is 0.63
+IntervalLen: 40 representant sample 9 leftRight
+decision tree score is 0.69
+SVM score is 0.63
+IntervalLen: 40 representant sample 10 leftRight
+decision tree score is 0.73
+SVM score is 0.63
+IntervalLen: 40 representant sample 11 leftRight
+decision tree score is 0.69
+SVM score is 0.63
+IntervalLen: 40 representant sample 12 leftRight
+decision tree score is 0.69
+SVM score is 0.63
+IntervalLen: 40 representant sample 13 leftRight
+decision tree score is 0.61
+SVM score is 0.63
+IntervalLen: 40 representant sample 14 leftRight
+decision tree score is 0.73
+SVM score is 0.63
+IntervalLen: 40 representant sample 15 leftRight
+decision tree score is 0.73
+SVM score is 0.63
+IntervalLen: 40 representant sample 16 leftRight
+decision tree score is 0.69
+SVM score is 0.63
+IntervalLen: 40 representant sample 17 leftRight
+decision tree score is 0.71
+SVM score is 0.47
+IntervalLen: 40 representant sample 18 leftRight
+decision tree score is 0.61
+SVM score is 0.47
+IntervalLen: 40 representant sample 19 leftRight
+decision tree score is 0.59
+SVM score is 0.47
+IntervalLen: 40 representant sample 20 leftRight
+decision tree score is 0.61
+SVM score is 0.47
+
+bestDTscore0.7254901960784313
+bestDTshift2
+bestSVMscore0.6274509803921569
+bestSVMshift0

@@ -1,0 +1,68 @@
+IntervalLen: 40 representant sample 0 frontBack
+decision tree score is 0.61
+SVM score is 0.45
+IntervalLen: 40 representant sample 1 frontBack
+decision tree score is 0.37
+SVM score is 0.45
+IntervalLen: 40 representant sample 2 frontBack
+decision tree score is 0.57
+SVM score is 0.63
+IntervalLen: 40 representant sample 3 frontBack
+decision tree score is 0.59
+SVM score is 0.45
+IntervalLen: 40 representant sample 4 frontBack
+decision tree score is 0.86
+SVM score is 0.45
+IntervalLen: 40 representant sample 5 frontBack
+decision tree score is 0.82
+SVM score is 0.45
+IntervalLen: 40 representant sample 6 frontBack
+decision tree score is 0.55
+SVM score is 0.45
+IntervalLen: 40 representant sample 7 frontBack
+decision tree score is 0.61
+SVM score is 0.67
+IntervalLen: 40 representant sample 8 frontBack
+decision tree score is 0.63
+SVM score is 0.63
+IntervalLen: 40 representant sample 9 frontBack
+decision tree score is 0.59
+SVM score is 0.45
+IntervalLen: 40 representant sample 10 frontBack
+decision tree score is 0.59
+SVM score is 0.51
+IntervalLen: 40 representant sample 11 frontBack
+decision tree score is 0.57
+SVM score is 0.67
+IntervalLen: 40 representant sample 12 frontBack
+decision tree score is 0.88
+SVM score is 0.67
+IntervalLen: 40 representant sample 13 frontBack
+decision tree score is 0.57
+SVM score is 0.67
+IntervalLen: 40 representant sample 14 frontBack
+decision tree score is 0.88
+SVM score is 0.67
+IntervalLen: 40 representant sample 15 frontBack
+decision tree score is 0.53
+SVM score is 0.43
+IntervalLen: 40 representant sample 16 frontBack
+decision tree score is 0.55
+SVM score is 0.59
+IntervalLen: 40 representant sample 17 frontBack
+decision tree score is 0.82
+SVM score is 0.57
+IntervalLen: 40 representant sample 18 frontBack
+decision tree score is 0.55
+SVM score is 0.71
+IntervalLen: 40 representant sample 19 frontBack
+decision tree score is 0.63
+SVM score is 0.75
+IntervalLen: 40 representant sample 20 frontBack
+decision tree score is 0.82
+SVM score is 0.76
+
+bestDTscore0.8823529411764706
+bestDTshift12
+bestSVMscore0.7647058823529411
+bestSVMshift20
