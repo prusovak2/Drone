@@ -250,6 +250,14 @@ def CreateDataWithRealAndImagPart(index, indexIterator, intervalLen, inputDF, ou
     outputDF.Yaw_FFT_SD[index] = np.std(fft)
 
 
+def CreateData(index, indexIterator, intervalLen, inputDF, outputDF, namesAndFunc):
+    for record in namesAndFunc:
+        outputColumnName = record['Name']
+        function = record['Func']
+        inputColumnName = record['Column']
+        outputDF[outputColumnName][index] = function(inputDF[inputColumnName][indexIterator:indexIterator + intervalLen])
+
+
 def CreateDataFrameForDTMatrix(inputDFmerged, ColumnNames, functionToCreateContend, functionToDiscreteCmds, intervalLen=40):
     '''
     splits rows to intervalLen long intervals, counts mean, std and mean and std of ffr within these intervals
@@ -274,49 +282,33 @@ def CreateDataFrameForDTMatrix(inputDFmerged, ColumnNames, functionToCreateConte
     return newDF
 
 
-def CreateDataFrameForDTMatrixShift(inputDFmerged, intervalLen=40, representantSampleShift=0):
+def CreateDataFrameForDTMatrixShift(inputDFmerged, intervalLen=40, representantSampleShift=0, funcArrayToCreateContent=None, ColumnNames=None):
     intIndexed = inputDFmerged.reset_index()
-    ColumnNames = dataColumnNamesRealImag
+    if ColumnNames is None:
+        ColumnNames = dataColumnNamesRealImag
     newDF, startOfIntervalIndices = CreateEmptyDataFrameWithShift(intervalLen, intIndexed, ColumnNames, representantSampleShift)
 
     # fill dataFrame with data
-    indexIterator = 0
-    for index in newDF.index:
-        MakeCMDsDiscreteWithFrozenDict(index, inputDFmerged, newDF)
-        CreateDataWithRealAndImagPart(index, indexIterator, intervalLen, inputDF=inputDFmerged, outputDF=newDF)
-        indexIterator += intervalLen
+    if funcArrayToCreateContent is not None:
+        indexIterator = 0
+        for index in newDF.index:
+            MakeCMDsDiscreteWithFrozenDict(index, inputDFmerged, newDF)
+            CreateData(index, indexIterator, intervalLen, inputDF=inputDFmerged, outputDF=newDF, namesAndFunc=funcArrayToCreateContent)
+            indexIterator += intervalLen
+    else:
+        indexIterator = 0
+        for index in newDF.index:
+            MakeCMDsDiscreteWithFrozenDict(index, inputDFmerged, newDF)
+            CreateDataWithRealAndImagPart(index, indexIterator, intervalLen, inputDF=inputDFmerged, outputDF=newDF)
+            indexIterator += intervalLen
 
     return newDF
 
 
-
-
-'''
-# Create DataForDTComplex
-dataColumnNamesComplex = ['leftRight', 'frontBack', 'angular', 'Roll_Mean', 'Roll_SD', 'Roll_FFT_Mean', 'Roll_FFT_SD',
-                   'Pitch_Mean', 'Pitch_SD', 'Pitch_FFT_Mean', 'Pitch_FFT_SD', 'Yaw_Mean', 'Yaw_SD', 'Yaw_FFT_Mean',
-                   'Yaw_FFT_SD']
-dataForDTComplex = CreateDataFrameForDTMatrix(inputDFmerged=merged, ColumnNames=dataColumnNamesComplex,
-                                              functionToCreateContend=CreateDataWithComplexValues, functionToDiscreteCmds=MakeCMDsDiscrete, intervalLen=40)
-dataForDTComplex.to_csv('OutputStages\\dataForDTComplex.tsv', sep='\t')
-'''
 # Create DataForDTRealImag
 dataColumnNamesRealImag = ['leftRight', 'frontBack', 'angular', 'Roll_Mean', 'Roll_SD', 'Roll_FFT_Mean_Real', 'Roll_FFT_Mean_Imag',
-                           'Roll_FFT_SD','Pitch_Mean', 'Pitch_SD', 'Pitch_FFT_Mean_Real', 'Pitch_FFT_Mean_Imag', 'Pitch_FFT_SD',
-                           'Yaw_Mean', 'Yaw_SD', 'Yaw_FFT_Mean_Real', 'Yaw_FFT_Mean_Imag','Yaw_FFT_SD']
-'''
-dataForDTRealImag = CreateDataFrameForDTMatrix(inputDFmerged=merged, ColumnNames=dataColumnNamesRealImag, functionToCreateContend=CreateDataWithRealAndImagPart,
-                                               functionToDiscreteCmds=MakeCMDsDiscrete, intervalLen=40)
-dataForDTRealImag.to_csv('OutputStages\\dataForDTRealImag.tsv', sep='\t')
-
-# Create Data fot DT with separated real and imag part and cms as enum
-dataForDTRealImagEnum = CreateDataFrameForDTMatrix(inputDFmerged=merged, ColumnNames=dataColumnNamesRealImag, functionToCreateContend=CreateDataWithRealAndImagPart,
-                                                   functionToDiscreteCmds=MakeCMDsDiscreteWithEnum, intervalLen=40)
-
-# print("DESCRIBING")
-# print(dataForDTRealImagEnum.describe())
-dataForDTRealImagEnum.to_csv('OutputStages\\dataForDTRealImagEnum.tsv', sep='\t')
-'''
+                           'Roll_FFT_SD', 'Pitch_Mean', 'Pitch_SD', 'Pitch_FFT_Mean_Real', 'Pitch_FFT_Mean_Imag', 'Pitch_FFT_SD',
+                           'Yaw_Mean', 'Yaw_SD', 'Yaw_FFT_Mean_Real', 'Yaw_FFT_Mean_Imag', 'Yaw_FFT_SD']
 
 # Create Data fot DT with separated real and imag part and cmds as frozen set item
 frozenCmds = frozendict({1: '-', 2: '0', 3: '+'})
@@ -363,10 +355,14 @@ leftRightData.to_csv('OutputStages\\leftRightData.tsv', sep='\t')
 shifted = CreateDataFrameForDTMatrixShift(inputDFmerged=merged, intervalLen=40,representantSampleShift=5)
 shifted.to_csv('OutputStages\\shifted5Data.tsv', sep='\t')
 
-"""
-for i in range(0,21):
-    shifted = CreateDataFrameForDTMatrixShift(inputDFmerged=merged, ColumnNames=dataColumnNamesRealImag, intervalLen=40,
-                                              representantSampleShift=i)
-    shifted.to_csv('OutputStages\\shiftedData.tsv', sep='\t')
-    print('shift '+str(i))
-"""
+
+namesAndFunc = [{'Name': 'Roll_Mean', 'Func': np.mean, 'Column': 'Roll_x'}, {'Name': 'Roll_SD', 'Func': np.std, 'Column': 'Roll_x'},
+                {'Name': 'Pitch_Mean', 'Func': np.mean, 'Column': 'Pitch_y'}, {'Name': 'Pitch_SD', 'Func': np.std, 'Column': 'Pitch_y'},
+                {'Name': 'Yaw_Mean', 'Func': np.mean, 'Column': 'Yaw_z'}, {'Name': 'Yaw_SD', 'Func': np.std, 'Column': 'Yaw_z'}]
+dataColumnNamesFucParams = ['leftRight', 'frontBack', 'angular', 'Roll_Mean', 'Roll_SD',  'Pitch_Mean', 'Pitch_SD',
+                           'Yaw_Mean', 'Yaw_SD']
+funcParamsData = CreateDataFrameForDTMatrixShift(inputDFmerged=merged, intervalLen=40, representantSampleShift=0,
+                                                 funcArrayToCreateContent=namesAndFunc, ColumnNames=dataColumnNamesFucParams)
+funcParamsData.to_csv('OutputStages\\funcParamData.tsv', sep='\t')
+
+
