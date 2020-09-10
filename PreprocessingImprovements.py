@@ -7,6 +7,7 @@ from CreateDataMatrixForDT import dataForCM
 from CreateDataMatrixForDT import CreateDataFrameForDTMatrixShift, merged
 from SupportVectorMachines import TuneParamsForSVM
 import matplotlib.pyplot as plt
+from pprint import pprint
 from sklearn.preprocessing import StandardScaler
 
 def ScoreModel(labelColumnName, model, dataForCM):
@@ -45,7 +46,7 @@ def deleteContent(fName):
 
 
 def TryShiftsForOneLabel(labelColumnName, mergedData,outputFileName, intervalLen=40, lowerShiftBorder=0, upperShiftBorder=20):
-	with open(outputFileName,"w") as outputFile:
+	with open(outputFileName, "w") as outputFile:
 		bestDTscore = 0
 		bestSVMscore = 0
 		for shift in range(lowerShiftBorder, upperShiftBorder + 1):
@@ -69,11 +70,75 @@ def TryShiftsForOneLabel(labelColumnName, mergedData,outputFileName, intervalLen
 		outputFile.write('bestDTshift' + str(bestDTShift) + "\n")
 		outputFile.write('bestSVMscore' + str(bestSVMscore) + "\n")
 		outputFile.write('bestSVMshift' + str(bestSVMshift) + "\n")
+		return bestDTscore, bestDTShift, bestSVMscore, bestSVMshift
 
 
+def TryShiftsForAllLabel(mergedData, outputFileName, intervalLen=40, lowerShiftBorder=0, upperShiftBorder=20):
+	with open(outputFileName, "w") as outputFile:
+		bestDTscore = {'leftRight': 0, 'frontBack': 0, 'angular': 0}
+		bestSVMscore = {'leftRight': 0, 'frontBack': 0, 'angular': 0}
+		bestDTshift = {'leftRight': None, 'frontBack': None, 'angular': None}
+		bestSVMshift = {'leftRight': None, 'frontBack': None, 'angular': None}
+		labels = ['leftRight', 'frontBack', 'angular']
+		bestDTscoreAverageLabels = 0
+		bestSVMscoreAverageLabels = 0
+		for shift in range(lowerShiftBorder, upperShiftBorder + 1):
+			shifted = CreateDataFrameForDTMatrixShift(inputDFmerged=mergedData, intervalLen=intervalLen,
+													  representantSampleShift=shift)
+			DTscore = {'leftRight': 0, 'frontBack': 0, 'angular': 0}
+			SVMscore = {'leftRight': 0, 'frontBack': 0, 'angular': 0}
+			for label in labels:
+				DTscore[label], SVMscore[label] = EvaluateModels(label, shifted, dataForCM, plt.cm.Blues,
+														" IntervalLen: " + str(intervalLen) + " representant sample " + str(
+														shift) + " ", outputFile, showCM=False)
+				if DTscore[label] > bestDTscore[label]:
+					bestDTscore[label] = DTscore[label]
+					bestDTshift[label] = shift
+				if SVMscore[label] > bestSVMscore[label]:
+					bestSVMscore[label] = SVMscore[label]
+					bestSVMshift[label] = shift
+			averageDTscore = (DTscore['leftRight']+DTscore['frontBack'] + DTscore['angular'])/3
+			averageSVMscore = (SVMscore['leftRight']+SVMscore['frontBack'] + SVMscore['angular'])/3
+			outputFile.write('average DT score: ' + str(averageDTscore)+'\n')
+			outputFile.write('average SVM score:' + str(averageSVMscore) + '\n')
+			if averageDTscore > bestDTscoreAverageLabels:
+				bestDTscoreAverageLabels =averageDTscore
+				bestDTAverageShift = shift
+			if averageSVMscore > bestSVMscoreAverageLabels:
+				bestSVMscoreAverageLabels = averageSVMscore
+				bestSVMaverageShift = shift
+
+		print('best DT average Score' + str(bestDTscoreAverageLabels))
+		print('best DT averages shift' + str(bestDTAverageShift))
+		print('best SVM average score' + str(bestSVMscoreAverageLabels))
+		print('best SVM average shift' + str(bestSVMaverageShift))
+		outputFile.write("\n")
+		outputFile.write('best DT average Score ' + str(bestDTscoreAverageLabels) + "\n")
+		outputFile.write('best DT averages shift ' + str(bestDTAverageShift) + "\n")
+		outputFile.write('best SVM average score ' + str(bestSVMscoreAverageLabels) + "\n")
+		outputFile.write('best SVM average shift ' + str(bestSVMaverageShift) + "\n")
+
+		print('bestDTscores:')
+		pprint(bestDTscore)
+		print('bestDTshifts:')
+		pprint(bestDTshift)
+		print('bestSVMscores:')
+		pprint(bestSVMscore)
+		print('bestSVMshifts:')
+		pprint(bestDTshift)
+
+		outputFile.write('bestDTscores:\n')
+		pprint(bestDTscore, stream=outputFile)
+		outputFile.write('bestDTshifts:\n')
+		pprint(bestDTshift, stream=outputFile)
+		outputFile.write('bestSVMscores:\n')
+		pprint(bestSVMscore, stream=outputFile)
+		outputFile.write('bestSVMshifts:\n')
+		pprint(bestDTshift, stream=outputFile)
 
 
-labels = ['leftRight', 'frontBack', 'angular']
 # TryShiftsForOneLabel('leftRight', merged, 'OutputStages\\scoresShiftLeftRight.txt')
 # TryShiftsForOneLabel('frontBack', merged, 'OutputStages\\scoresShiftFrontBack.txt')
-TryShiftsForOneLabel('angular', merged, 'OutputStages\\scoresShiftAngular.txt')
+# TryShiftsForOneLabel('angular', merged, 'OutputStages\\scoresShiftAngular.txt')
+
+TryShiftsForAllLabel(merged, 'OutputStages\\scoresShiftAllLabels.txt')
