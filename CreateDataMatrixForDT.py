@@ -7,16 +7,18 @@ from ReadResampleMerge import mergedSecondSet
 from ReadResampleMerge import mergedSecondCM
 from ReadResampleMerge import mergedLeftRight
 
+# this modul turn resampled and merged into a matrices go base a machine learning on
+
 def CreateEmptyDataFrame(intervalLen, intIndexedDF, dataColumnNames):
     '''
-    create matrix to base a machine learning on
-    indexed starting point of time intervals of intervalLen
-    :param intervalLen:
-    :param intIndexedDF:
-    :param dataColumnNames:
-    :return: empty indexed dataFrame
+    creates an empty dataFrame with columns given by dataColumnNames
+    that has one row for each interval of intervalLen of records from merged dataframe (intIndexedDF)
+    indexed by starting point of time intervals of intervalLen
+    :param intervalLen: how many records from inputDF creates one interval (therefore one record of output dataframe)
+    :param intIndexedDF: output of ReadResampleMerge with time index reset so that its indexed by ints
+    :param dataColumnNames: array containing names of outputDF columns
+    :return: empty time indexed dataFrame with appropriate num of columns and rows
     '''
-    # intervalLen = 40
     # prepare indices for a new dataframe
     ind = list()
     indexIterator = 0  # int, counts rows
@@ -30,23 +32,33 @@ def CreateEmptyDataFrame(intervalLen, intIndexedDF, dataColumnNames):
 
     # create an empty dataframe
     dataForDT = pd.DataFrame(columns=dataColumnNames, index=ind)
-    # interpret ind as a time (it is a time)
+    # interpret int as a time (it is a time)
     dataForDT.index = pd.to_datetime(dataForDT.index, unit='ms')
     dataForDT.index.name = 'time'
     return dataForDT
 
 
 def CreateEmptyDataFrameWithShift(intervalLen, intIndexedDF, dataColumnNames, representantShift):
+    """
+    creates an empty dataFrame with columns given by dataColumnNames
+    that has one row for each interval of intervalLen of records from merged dataframe (intIndexedDF)
+    indexed by a time of nth point in interval where n=representatntShift
+    :param intervalLen: how many records from inputDF creates one interval (therefore one record of output dataframe)
+    :param intIndexedDF: output of ReadResampleMerge with time index reset so that its indexed by ints
+    :param dataColumnNames: array containing names of outputDF columns
+    :param representantShift: which sample should represent an interval - by time and cmds
+    :return:
+    """
     if representantShift >= intervalLen:
+        # trying to represent an interval by a sample that does not belong to it
         raise AttributeError
-    # prepare indices for a new dataframe
+    # prepare indices for a new dataFrame
     indexOfNexDF = list()
     startIdicesOfIntervals = list()
     indexIterator = 0  # int, counts rows
     while (indexIterator + representantShift) < intIndexedDF.index.size:
-        # time from the row corresponding to index iterator - STARTING point of the interval
+        # time from the row corresponding to index iterator - representantShift'th point of interval
         indexOfNexDF.append(intIndexedDF.time.iloc[indexIterator+representantShift])
-        # TODO: will this work even thou its not a datetime?
         startIdicesOfIntervals.append(intIndexedDF.time.iloc[indexIterator])
         # move by intervalLen number of rows ahead
         indexIterator += intervalLen
@@ -55,7 +67,7 @@ def CreateEmptyDataFrameWithShift(intervalLen, intIndexedDF, dataColumnNames, re
 
     # create an empty dataframe
     dataForDT = pd.DataFrame(columns=dataColumnNames, index=indexOfNexDF)
-    # interpret ind as a time (it is a time)
+    # interpret int as a time (it is a time)
     dataForDT.index = pd.to_datetime(dataForDT.index, unit='ms')
     dataForDT.index.name = 'time'
     return dataForDT, startIdicesOfIntervals
@@ -146,7 +158,7 @@ def MakeCMDsDiscreteWithFrozenDict(index, inputDF, outputDF):
     USE THIS
     gain discrete value of CMDs on given index
     discrete values represented as values from frozen dictionary
-    works
+    works - use this function to obtain discrete vals of cmds
     :param index:
     :param inputDF:
     :param outputDF:
@@ -180,7 +192,7 @@ def MakeCMDsDiscreteWithFrozenDict(index, inputDF, outputDF):
 
 def CreateDataWithComplexValues(index, indexIterator, intervalLen, inputDF, outputDF):
     '''
-    fill one row of dataFrame for decisionTree with data
+    fill one row of dataFrame for MLmodel with data
     for roll, pitch and jaw count mean, std and mean and std of fft
     each row represents one interval of intervalLen records from inputDF
     keep complex values in outputDF
@@ -213,15 +225,15 @@ def CreateDataWithComplexValues(index, indexIterator, intervalLen, inputDF, outp
 
 def CreateDataWithRealAndImagPart(index, indexIterator, intervalLen, inputDF, outputDF):
     '''
-    fill one row of dataFrame for decisionTree with data
+    fill one row of dataFrame for MLmodel with data
     for roll, pitch and jaw count mean, std and mean and std of fft
     each row represents one interval of intervalLen records from inputDF
     split complex values to real and imaginary part
-    :param index:
-    :param indexIterator:
-    :param intervalLen:
-    :param inputDF:
-    :param outputDF:
+    :param index: index of the row of outputDF that is to be filled with data by this call
+    :param indexIterator: index of the row of inputDF - the first row of the interval
+    :param intervalLen: how many records does one interval contain
+    :param inputDF: output of ReadresampleMerge - data to create dataMatrix for ML algs. from
+    :param outputDF: data matrix to base machine learning on
     :return:
     '''
     # Roll
@@ -251,6 +263,18 @@ def CreateDataWithRealAndImagPart(index, indexIterator, intervalLen, inputDF, ou
 
 
 def CreateData(index, indexIterator, intervalLen, inputDF, outputDF, namesAndFunc):
+    """
+    fill one row of dataFrame for MLmodel with data
+    functions to count values of outputDF based on interval of values from inputDF are passed in nameAndFunc array od dictionaries
+    each dictionary has to have keys 'Name', 'Func', 'Column'
+    each row represents one interval of intervalLen records from inputDF
+    :param index:
+    :param indexIterator:
+    :param intervalLen:
+    :param inputDF:
+    :param outputDF:
+    :param namesAndFunc: namesAndFunc = [{'Name': 'Name of column in outputDF to be filled', 'Func': func to count a value, 'Column': column of inputDF to provide args for a function },...]
+    """
     for record in namesAndFunc:
         outputColumnName = record['Name']
         function = record['Func']
@@ -260,7 +284,7 @@ def CreateData(index, indexIterator, intervalLen, inputDF, outputDF, namesAndFun
 
 def CreateDataFrameForDTMatrix(inputDFmerged, ColumnNames, functionToCreateContend, functionToDiscreteCmds, intervalLen=40):
     '''
-    splits rows to intervalLen long intervals, counts mean, std and mean and std of ffr within these intervals
+    splits rows to intervalLen long intervals, counts mean, std and mean and std of fft within these intervals
     creates a new dataFrame with one row for each interval, time index of row is the time of the first record in the interval
     :param inputDFmerged:
     :param ColumnNames:
@@ -283,6 +307,19 @@ def CreateDataFrameForDTMatrix(inputDFmerged, ColumnNames, functionToCreateConte
 
 
 def CreateDataFrameForDTMatrixShift(inputDFmerged, intervalLen=40, representantSampleShift=0, funcArrayToCreateContent=None, ColumnNames=None):
+    """
+    splits rows to intervalLen long intervals
+    when funcArrayToCreateContent is None counts mean, std and mean and std of fft within these intervals
+    otherwise counts values using function passed in funcArrayToCreateContent
+    creates a new dataFrame with one row for each interval
+    time index of row is the time of the nth record in the interval where n=representantSampleShift
+    :param inputDFmerged: aoutput of ReadResampleMerge
+    :param intervalLen:
+    :param representantSampleShift:
+    :param funcArrayToCreateContent:
+    :param ColumnNames:
+    :return: data matrix to base machine learning on
+    """
     intIndexed = inputDFmerged.reset_index()
     if ColumnNames is None:
         ColumnNames = dataColumnNamesRealImag
@@ -290,12 +327,14 @@ def CreateDataFrameForDTMatrixShift(inputDFmerged, intervalLen=40, representantS
 
     # fill dataFrame with data
     if funcArrayToCreateContent is not None:
+        # use functions from funcArrayToCreateContent to create content of DF
         indexIterator = 0
         for index in newDF.index:
             MakeCMDsDiscreteWithFrozenDict(index, inputDFmerged, newDF)
             CreateData(index, indexIterator, intervalLen, inputDF=inputDFmerged, outputDF=newDF, namesAndFunc=funcArrayToCreateContent)
             indexIterator += intervalLen
     else:
+        # count mean, std and mean and std of fft as a content of DF
         indexIterator = 0
         for index in newDF.index:
             MakeCMDsDiscreteWithFrozenDict(index, inputDFmerged, newDF)
@@ -312,17 +351,12 @@ dataColumnNamesRealImag = ['leftRight', 'frontBack', 'angular', 'Roll_Mean', 'Ro
 
 # Create Data fot DT with separated real and imag part and cmds as frozen set item
 frozenCmds = frozendict({1: '-', 2: '0', 3: '+'})
-# Original data
 # create dataFrame to base a decision tree on
 dataForDTRealImagFrozenDict = CreateDataFrameForDTMatrix(inputDFmerged=merged, ColumnNames=dataColumnNamesRealImag,
                                                          functionToCreateContend=CreateDataWithRealAndImagPart,
                                                          functionToDiscreteCmds=MakeCMDsDiscreteWithFrozenDict,
                                                          intervalLen=40)
 dataForDTRealImagFrozenDict.to_csv('OutputStages\\dataForDTRealImagFrozenDict.tsv', sep='\t')
-
-shifted = CreateDataFrameForDTMatrixShift(inputDFmerged=merged)
-shifted.to_csv('OutputStages\\shifted0Data.tsv', sep='\t')
-
 
 # new data for Confusion Matrix - evaluation of DT
 dataForCM = CreateDataFrameForDTMatrix(inputDFmerged=mergedCM, ColumnNames=dataColumnNamesRealImag,
@@ -331,12 +365,14 @@ dataForCM = CreateDataFrameForDTMatrix(inputDFmerged=mergedCM, ColumnNames=dataC
                                        intervalLen=40)
 dataForCM.to_csv('OutputStages\\dataForCM.tsv', sep='\t')
 
+# data matrix from newer own data
 dataDTSecondSet = CreateDataFrameForDTMatrix(inputDFmerged=mergedSecondSet, ColumnNames=dataColumnNamesRealImag,
                                        functionToCreateContend=CreateDataWithRealAndImagPart,
                                        functionToDiscreteCmds=MakeCMDsDiscreteWithFrozenDict,
                                        intervalLen=40)
 dataDTSecondSet.to_csv('OutputStages\\dataDTSecondSet.tsv', sep='\t')
 
+# data matrix for model evaluation from own data
 dataDTSecondCM = CreateDataFrameForDTMatrix(inputDFmerged=mergedSecondCM, ColumnNames=dataColumnNamesRealImag,
                                        functionToCreateContend=CreateDataWithRealAndImagPart,
                                        functionToDiscreteCmds=MakeCMDsDiscreteWithFrozenDict,
@@ -351,11 +387,11 @@ leftRightData = CreateDataFrameForDTMatrix(inputDFmerged=mergedLeftRight, Column
                                        intervalLen=20)
 leftRightData.to_csv('OutputStages\\leftRightData.tsv', sep='\t')
 
-
+# to test CreateDataFrameForDTMatrixShift function
 shifted = CreateDataFrameForDTMatrixShift(inputDFmerged=merged, intervalLen=40,representantSampleShift=5)
 shifted.to_csv('OutputStages\\shifted5Data.tsv', sep='\t')
 
-
+# example of passing own functions to create dataFrame contend to CreateDataFrameForDTMatrixShift method
 namesAndFunc = [{'Name': 'Roll_Mean', 'Func': np.mean, 'Column': 'Roll_x'}, {'Name': 'Roll_SD', 'Func': np.std, 'Column': 'Roll_x'},
                 {'Name': 'Pitch_Mean', 'Func': np.mean, 'Column': 'Pitch_y'}, {'Name': 'Pitch_SD', 'Func': np.std, 'Column': 'Pitch_y'},
                 {'Name': 'Yaw_Mean', 'Func': np.mean, 'Column': 'Yaw_z'}, {'Name': 'Yaw_SD', 'Func': np.std, 'Column': 'Yaw_z'}]

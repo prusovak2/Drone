@@ -10,6 +10,9 @@ from sklearn.pipeline import Pipeline
 from sklearn.model_selection import GridSearchCV
 from sklearn.preprocessing import StandardScaler
 
+# this modul tunes hyperparameters for a decision tree and subsequently builds DT with the best hyperparameters found
+# methods from this modul require dataMatrices created by some methods from CreateDataMatrixForDT modul
+
 def GetLabel(labelColumn, dataMatrix):
     '''
     separates a column to be predicted
@@ -49,6 +52,7 @@ def CrossValidation(pipeline, params_to_try, x_train, y_train, x_test, y_test):
     DT_criterion = ''
     DT_maxDepth = 0
     for cv in range(3, 6):
+        # try all possible combinations of params_to_try
         create_grid = GridSearchCV(pipeline, param_grid=params_to_try, cv=cv)
         create_grid.fit(x_train, y_train)
         newScore = create_grid.score(x_test, y_test)
@@ -68,10 +72,10 @@ def BuildDT(labelColumn, dataMatrix):
     for a given label column tries to determine the best decision tree parameters via 3,4 and 5 cross validation
     then builds a decision tree with the best parameters found
     :param labelColumn:
-    :param dataMatrix:
-    :param pipeline:
+    :param dataMatrix: to base learning on
+    :param pipeline: StandartScaler and basic decision tree
     :param params_to_try:
-    :return:
+    :return: decision tree, train_Features, train_Labels, test_Features, test_Labels
     '''
     # split what I want to predict from what I want to base a prediction on
     labels = GetLabel(labelColumn, dataMatrix)
@@ -80,12 +84,12 @@ def BuildDT(labelColumn, dataMatrix):
     # prepare pipeline, that carries out a data standartization - to make a features have a variance in a same order
     # and creates DT
     scaler = StandardScaler()
-    pipe_steps = [('scaler', scaler), ('decisionTree', DecisionTreeClassifier())]
+    pipe_steps = [('scaler', scaler), ('MLmodel', DecisionTreeClassifier())]
     pipeline = Pipeline(pipe_steps)
     print(pipeline)
     print(pipeline.get_params().keys())
 
-    # DT attributes I wanna estimate - are there any other?
+    # DT attributes I wanna estimate
     params_to_try = {'decisionTree__criterion': ['gini', 'entropy'],
                      'decisionTree__max_depth': np.arange(3, 15)}
     # np.arange(3, 15): totally random estimation of max tree depth taken from a tutorial. I have no clue whether it
@@ -102,14 +106,13 @@ def BuildDT(labelColumn, dataMatrix):
     # build DT
     decisionTree = DecisionTreeClassifier(criterion=bestParams['DT_criterion'], max_depth=bestParams['DT_maxDepth'])
     decisionTree.fit(x_train, y_train)
-    scaler = StandardScaler()
 
     return decisionTree, x_train, y_train, x_test, y_test
 
 
 def GraphTree(decisionTree, features, pngFileName):
     '''
-    outputs a graph of a decisionTree into pngFileName output file
+    outputs a graph of a MLmodel into pngFileName output file
     :param decisionTree:
     :param features:
     :param pngFileName:

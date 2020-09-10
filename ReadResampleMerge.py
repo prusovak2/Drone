@@ -1,11 +1,15 @@
 import pandas as pd
 import numpy as np
 
+# this modul enables to read CMD and NAVDATA files, resample them to given frequency and merge them together
+# it provides a preparation for data preprocessing carried out by CreateDataMatrixFotDT modul
+
 def ReadCMDScvsIntoDFandResample(filename, frequency):
     '''
     reads CMD file and resamples it to given frequency
-    :param filename:
-    :param frequency:
+    samples are resampled so that their time indices create an arithmetic sequence with common difference of frequency parameter
+    :param filename: file to read commands from
+    :param frequency: ms
     :return: dataFrame containing resampled CMDs
     '''
     cmdsColumnNames = ['time', 'leftRight', 'frontBack', 'up', 'angular']
@@ -14,6 +18,7 @@ def ReadCMDScvsIntoDFandResample(filename, frequency):
     cmds = cmds.set_index('time')
     # print("unique cmds time:", cmds.index.is_unique)
 
+    # resample
     resampledCmds = cmds.resample(frequency).mean()
     resampledCmds = resampledCmds.reindex().bfill()
     resampledCmds = resampledCmds[cmds.index[0]:cmds.index[-1]]
@@ -22,7 +27,8 @@ def ReadCMDScvsIntoDFandResample(filename, frequency):
 def ReadNAVDATAcsvIntoDFandResample(filename, frequency):
     '''
     reads NAVDATA file and resamples it to given frequency
-    :param filename:
+    samples are resampled so that their time indices create an arithmetic sequence with common difference of frequency parameter
+    :param filename: file to read NAVDATA from
     :param frequency:
     :return: dataFrame containing resampled NAVDATA
     '''
@@ -47,6 +53,7 @@ def ReadNAVDATAcsvIntoDFandResample(filename, frequency):
     navData.time = pd.to_datetime(navData.time, unit='ms')
     navData = navData.set_index('time')
 
+    # resample
     resampledNav = navData.resample(frequency).mean()
     resampledNav = resampledNav.reindex().bfill()
     resampledNav = resampledNav[navData.index[0]:navData.index[-1]]
@@ -58,12 +65,12 @@ def ReadResampleMerge(cmdsFilename, navdataFilename, frequency, cmdOutputTsvFile
     '''
     reads cmd and navdata files, resamples them to given frequency and results merges by ctime
     when output file names are given, prints corresponding outputs to .tsv files
-    :param cmdsFilename:
-    :param navdataFilename:
-    :param frequency:
-    :param cmdOutputTsvFilename:
-    :param navdataOutputTsvFilename:
-    :param mergedOutputTsvFilename:
+    :param cmdsFilename: file to read CMDs from
+    :param navdataFilename: file to read NAVDATA from
+    :param frequency: ms
+    :param cmdOutputTsvFilename: file to output resampled CMDs to
+    :param navdataOutputTsvFilename: file to output resampled NAVDARA to
+    :param mergedOutputTsvFilename: file to output resampled and merged data
     :return:
     '''
     # READ AND RESAMPLE INPUT DATA

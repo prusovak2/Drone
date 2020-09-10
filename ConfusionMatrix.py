@@ -10,26 +10,26 @@ from CreateDataMatrixForDT import frozenCmds
 from CreateDataMatrixForDT import dataDTSecondCM
 
 
-# TODO: standartisation of cm data? if so, how?
-def CreateConfusionMatrix(labelColumnName, validationDataMatrix, decisionTree, cmTitle, color, scaler=None, showCM=True):
+def CreateConfusionMatrix(labelColumnName, validationDataMatrix, MLmodel, cmTitle, color, scaler=None, showCM=True):
     '''
-    for given decision tree creates a confusion matrix showing how well DT performs while predicting
-    labels from validationDataMatrix Dt was not trained on
-    :param labelColumnName: name of a label column that is predicted bt DT
-    :param validationDataMatrix: data matrix, that DT was not trained on
-    :param decisionTree: DT whose quality is to be evaluated
-    :param cmTitle: name fot an output confusion matrix
-    :return:
+    for given MLmodel creates a confusion matrix showing how well the model performs while predicting
+    labels from validationDataMatrix model was not trained on
+    :param labelColumnName: name of a label column that is predicted by model
+    :param validationDataMatrix: data matrix, that model was not trained on
+    :param MLmodel: model whose quality is to be evaluated
+    :param cmTitle: name of an output confusion matrix
+    :param color: color of created CM, plt.cm.something
+    :param scaler: standardSacler that was used to standardize training data for the model, is used to standardize validationData as well
+    :param showCM: should CM be shown?
+    :return: features of validation data, standardized when scaler is not None
     '''
     realLabels = bdt.GetLabel(labelColumnName, validationDataMatrix)
     features = bdt.GetFeatures(validationDataMatrix)
     if scaler is not None:
+        # standardize validation data by same scaler that was used for a training data
         features = scaler.transform(features)
-    # predictedLabels = decisionTree.predict(features)
-    # if labelColumnName == 'leftRight':
-    #    features = bdt.scaler.transform(features)
 
-    disp = plot_confusion_matrix(decisionTree, features, realLabels,
+    disp = plot_confusion_matrix(MLmodel, features, realLabels,
                                  display_labels=[*frozenCmds.values()],
                                  cmap=color,
                                  normalize=None)
@@ -50,29 +50,3 @@ if __name__ == "__main__":
     CreateConfusionMatrix('frontBack', dataDTSecondCM, bdt.DTfrontBackSecond, "frontBackCMSecond", plt.cm.Reds)
     CreateConfusionMatrix('angular', dataDTSecondCM, bdt.DTangularSecond, "angularCMSecond", plt.cm.Reds)
 
-'''
-realLabels = bdt.GetLabel("leftRight", dataForCM)
-features = bdt.GetFeatures(dataForCM)
-predictedLabels = bdt.DTleftRight.predict(features)
-
-# print(bdt.x_testLR)
-# y_pred = bdt.DTleftRight.predict(bdt.x_testLR)
-# print("y_pred:")
-# print(y_pred)
-# print("y_testLR")
-# print(bdt.y_testLR)
-# cm = confusion_matrix(realLabels, predictedLabels)
-# print(cm)
-
-#plot_confusion_matrix(cm, normalize=False, target_names=[*frozenCmds.values()], title="Confusion Matrix")
-
-disp = plot_confusion_matrix(bdt.DTleftRight, features, realLabels,
-                                 display_labels=[*frozenCmds.values()],
-                                 cmap=plt.cm.Blues,
-                                 normalize=None)
-disp.ax_.set_title("My awesome CM")
-print("My awesome CM")
-print(disp.confusion_matrix)
-
-plt.show()
-'''
