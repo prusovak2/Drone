@@ -161,4 +161,13 @@ Tento způsob určování funkcí pro zpracování dat z intervalů do `feature`
 
 ### Machine learning modely
 
- 
+Projekt obsahuje metody, jež se pokouší najít nejlepší hyperparametry pro `DecisionTree`, `RandomForest` a `SupportVectorMachines` na daných datech a následně vytvoří modely s těmito parametry. Pro `DecisionTree` (v rámci metody `BuildDT`) a `SupportVectorMachines` (metoda `TuneParamsForSVM`) je pro optimalizaci hyperparametrů použita 3, 4 a 5 `fold` `CrossValidation` (`sklearn.model_selection.GridSearchCV`). Pro `RandomForest` jsou nejprve odhadnuty hyperparametry metodou `sklearn.model_selection.RandomizedSearchCV`. Na základě výstupu této metody je pak sestavena sada parametrů, které jsou předloženy metodě (`sklearn.model_selection.GridSearchCV`) k vyzkoušení.
+
+![decisionTree](https://github.com/prusovak2/Drone/blob/master/OutputStages/Graphs/frontBackDT.png)
+
+
+
+
+
+
+
