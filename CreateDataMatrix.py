@@ -282,14 +282,14 @@ def CreateData(index, indexIterator, intervalLen, inputDF, outputDF, namesAndFun
         outputDF[outputColumnName][index] = function(inputDF[inputColumnName][indexIterator:indexIterator + intervalLen])
 
 
-def CreateDataFrameForDTMatrix(inputDFmerged, ColumnNames, functionToCreateContend=CreateDataWithRealAndImagPart,
+def CreateDataFrameForDTMatrix(inputDFmerged, ColumnNames, functionToCreateContent=CreateDataWithRealAndImagPart,
                                functionToDiscreteCmds=MakeCMDsDiscreteWithFrozenDict, intervalLen=40):
     '''
     splits rows to intervalLen long intervals, counts mean, std and mean and std of fft within these intervals
     creates a new dataFrame with one row for each interval, time index of row is the time of the first record in the interval
     :param inputDFmerged:
     :param ColumnNames:
-    :param functionToCreateContend:
+    :param functionToCreateContent:
     :param functionToDiscreteCmds:
     :param intervalLen:
     :return: dataFrame to base decision tree on
@@ -301,7 +301,7 @@ def CreateDataFrameForDTMatrix(inputDFmerged, ColumnNames, functionToCreateConte
     indexIterator = 0
     for index in newDF.index:
         functionToDiscreteCmds(index, inputDFmerged, newDF)
-        functionToCreateContend(index, indexIterator, intervalLen, inputDF=inputDFmerged, outputDF=newDF)
+        functionToCreateContent(index, indexIterator, intervalLen, inputDF=inputDFmerged, outputDF=newDF)
         indexIterator += intervalLen
 
     return newDF
@@ -354,38 +354,38 @@ dataColumnNamesRealImag = ['leftRight', 'frontBack', 'angular', 'Roll_Mean', 'Ro
 frozenCmds = frozendict({1: '-', 2: '0', 3: '+'})
 # create dataFrame to base a decision tree on
 dataForDTRealImagFrozenDict = CreateDataFrameForDTMatrix(inputDFmerged=merged, ColumnNames=dataColumnNamesRealImag,
-                                                         functionToCreateContend=CreateDataWithRealAndImagPart,
+                                                         functionToCreateContent=CreateDataWithRealAndImagPart,
                                                          functionToDiscreteCmds=MakeCMDsDiscreteWithFrozenDict,
                                                          intervalLen=40)
 dataForDTRealImagFrozenDict.to_csv('OutputStages\\dataForDTRealImagFrozenDict.tsv', sep='\t')
 
 # new data for Confusion Matrix - evaluation of DT
 dataForCM = CreateDataFrameForDTMatrix(inputDFmerged=mergedCM, ColumnNames=dataColumnNamesRealImag,
-                                       functionToCreateContend=CreateDataWithRealAndImagPart,
+                                       functionToCreateContent=CreateDataWithRealAndImagPart,
                                        functionToDiscreteCmds=MakeCMDsDiscreteWithFrozenDict,
                                        intervalLen=40)
 dataForCM.to_csv('OutputStages\\dataForCM.tsv', sep='\t')
 
 # data matrix from newer own data
 dataDTSecondSet = CreateDataFrameForDTMatrix(inputDFmerged=mergedSecondSet, ColumnNames=dataColumnNamesRealImag,
-                                       functionToCreateContend=CreateDataWithRealAndImagPart,
-                                       functionToDiscreteCmds=MakeCMDsDiscreteWithFrozenDict,
-                                       intervalLen=40)
+                                             functionToCreateContent=CreateDataWithRealAndImagPart,
+                                             functionToDiscreteCmds=MakeCMDsDiscreteWithFrozenDict,
+                                             intervalLen=40)
 dataDTSecondSet.to_csv('OutputStages\\dataDTSecondSet.tsv', sep='\t')
 
 # data matrix for model evaluation from own data
 dataDTSecondCM = CreateDataFrameForDTMatrix(inputDFmerged=mergedSecondCM, ColumnNames=dataColumnNamesRealImag,
-                                       functionToCreateContend=CreateDataWithRealAndImagPart,
-                                       functionToDiscreteCmds=MakeCMDsDiscreteWithFrozenDict,
-                                       intervalLen=40)
+                                            functionToCreateContent=CreateDataWithRealAndImagPart,
+                                            functionToDiscreteCmds=MakeCMDsDiscreteWithFrozenDict,
+                                            intervalLen=40)
 dataDTSecondCM.to_csv('OutputStages\\dataDTSecondCM.tsv', sep='\t')
 
 
 # USELESS - too few samples
 leftRightData = CreateDataFrameForDTMatrix(inputDFmerged=mergedLeftRight, ColumnNames=dataColumnNamesRealImag,
-                                       functionToCreateContend=CreateDataWithRealAndImagPart,
-                                       functionToDiscreteCmds=MakeCMDsDiscreteWithFrozenDict,
-                                       intervalLen=20)
+                                           functionToCreateContent=CreateDataWithRealAndImagPart,
+                                           functionToDiscreteCmds=MakeCMDsDiscreteWithFrozenDict,
+                                           intervalLen=20)
 leftRightData.to_csv('OutputStages\\leftRightData.tsv', sep='\t')
 
 # to test CreateDataFrameForDTMatrixShift function
