@@ -282,7 +282,8 @@ def CreateData(index, indexIterator, intervalLen, inputDF, outputDF, namesAndFun
         outputDF[outputColumnName][index] = function(inputDF[inputColumnName][indexIterator:indexIterator + intervalLen])
 
 
-def CreateDataFrameForDTMatrix(inputDFmerged, ColumnNames, functionToCreateContend, functionToDiscreteCmds, intervalLen=40):
+def CreateDataFrameForDTMatrix(inputDFmerged, ColumnNames, functionToCreateContend=CreateDataWithRealAndImagPart,
+                               functionToDiscreteCmds=MakeCMDsDiscreteWithFrozenDict, intervalLen=40):
     '''
     splits rows to intervalLen long intervals, counts mean, std and mean and std of fft within these intervals
     creates a new dataFrame with one row for each interval, time index of row is the time of the first record in the interval

@@ -1,13 +1,17 @@
 from BuildDT import BuildDT
 from ConfusionMatrix import CreateConfusionMatrix
 from BuildDT import GetFeatures, GetLabel
-from CreateDataMatrixForDT import dataForDTRealImagFrozenDict as dataForModel
+from CreateDataMatrix import dataForDTRealImagFrozenDict as dataForModel
 from BuildRandomForest import GetLabelAndFeatureData
-from CreateDataMatrixForDT import dataForCM
-from CreateDataMatrixForDT import CreateDataFrameForDTMatrixShift, merged
+from CreateDataMatrix import dataForCM
+from CreateDataMatrix import CreateDataFrameForDTMatrixShift, merged
 from SupportVectorMachines import TuneParamsForSVM
 import matplotlib.pyplot as plt
 from pprint import pprint
+
+# this model provides some methods for tuning how should data be preprocessed
+# it is focused on improving length of an interval and representative sample of an interval
+# it also provides some methods evaluating a model performance
 
 def ScoreModel(labelColumnName, model, dataForCM):
 	"""

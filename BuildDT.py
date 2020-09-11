@@ -1,9 +1,9 @@
 import pandas as pd
 import numpy as np
 import graphviz
-from CreateDataMatrixForDT import dataForDTRealImagFrozenDict
-from CreateDataMatrixForDT import dataDTSecondSet
-from CreateDataMatrixForDT import Cmd
+from CreateDataMatrix import dataForDTRealImagFrozenDict
+from CreateDataMatrix import dataDTSecondSet
+from CreateDataMatrix import Cmd
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.pipeline import Pipeline
@@ -122,7 +122,7 @@ def GraphTree(decisionTree, features, pngFileName):
     from IPython.display import Image
     from sklearn.tree import export_graphviz
     import pydotplus
-    from CreateDataMatrixForDT import frozenCmds
+    from CreateDataMatrix import frozenCmds
 
     dot_data = StringIO()
 

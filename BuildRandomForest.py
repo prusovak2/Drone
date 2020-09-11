@@ -9,9 +9,9 @@ from sklearn.preprocessing import StandardScaler
 
 from BuildDT import GetLabel
 from BuildDT import GetFeatures
-from CreateDataMatrixForDT import dataForDTRealImagFrozenDict as dataForRF
+from CreateDataMatrix import dataForDTRealImagFrozenDict as dataForRF
 from ConfusionMatrix import CreateConfusionMatrix
-from CreateDataMatrixForDT import dataForCM
+from CreateDataMatrix import dataForCM
 
 # given dataMatrix created in CreateDataMatrixForDT modul, this modul attempts to tune hyperparameters for a RandomForest
 # and subsequently creates RandomForest with the best hyperparameters found

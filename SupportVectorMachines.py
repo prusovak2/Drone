@@ -8,11 +8,11 @@ from pprint import pprint
 
 from sklearn import svm, datasets
 
-from CreateDataMatrixForDT import dataDTSecondSet as dataForSVM
-from CreateDataMatrixForDT import dataForDTRealImagFrozenDict as dataForSVMOlder
-from CreateDataMatrixForDT import dataDTSecondCM as dataForCMSecond
+from CreateDataMatrix import dataDTSecondSet as dataForSVM
+from CreateDataMatrix import dataForDTRealImagFrozenDict as dataForSVMOlder
+from CreateDataMatrix import dataDTSecondCM as dataForCMSecond
 from ConfusionMatrix import CreateConfusionMatrix
-from CreateDataMatrixForDT import dataForCM
+from CreateDataMatrix import dataForCM
 from BuildDT import GetLabel
 from BuildDT import GetFeatures
 

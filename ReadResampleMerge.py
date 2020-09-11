@@ -60,7 +60,7 @@ def ReadNAVDATAcsvIntoDFandResample(filename, frequency):
     return resampledNav
 
 
-def ReadResampleMerge(cmdsFilename, navdataFilename, frequency, cmdOutputTsvFilename=None, navdataOutputTsvFilename=None,
+def ReadResampleMerge(cmdsFilename, navdataFilename, frequency='50ms', cmdOutputTsvFilename=None, navdataOutputTsvFilename=None,
                       mergedOutputTsvFilename=None):
     '''
     reads cmd and navdata files, resamples them to given frequency and results merges by ctime

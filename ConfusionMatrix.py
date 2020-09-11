@@ -5,9 +5,9 @@ from sklearn.metrics import plot_confusion_matrix
 import matplotlib.pyplot as plt
 
 import BuildDT as bdt
-from CreateDataMatrixForDT import dataForCM
-from CreateDataMatrixForDT import frozenCmds
-from CreateDataMatrixForDT import dataDTSecondCM
+from CreateDataMatrix import dataForCM
+from CreateDataMatrix import frozenCmds
+from CreateDataMatrix import dataDTSecondCM
 
 
 def CreateConfusionMatrix(labelColumnName, validationDataMatrix, MLmodel, cmTitle, color, scaler=None, showCM=True):
