@@ -161,11 +161,27 @@ Tento způsob určování funkcí pro zpracování dat z intervalů do `feature`
 
 ### Machine learning modely
 
-Projekt obsahuje metody, jež se pokouší najít nejlepší hyperparametry pro `DecisionTree`, `RandomForest` a `SupportVectorMachines` na daných datech a následně vytvoří modely s těmito parametry. Pro `DecisionTree` (v rámci metody `BuildDT`) a `SupportVectorMachines` (metoda `TuneParamsForSVM`) je pro optimalizaci hyperparametrů použita 3, 4 a 5 `fold` `CrossValidation` (`sklearn.model_selection.GridSearchCV`). Pro `RandomForest` jsou nejprve odhadnuty hyperparametry metodou `sklearn.model_selection.RandomizedSearchCV`. Na základě výstupu této metody je pak sestavena sada parametrů, které jsou předloženy metodě (`sklearn.model_selection.GridSearchCV`) k vyzkoušení.
+Projekt obsahuje metody, jež se pokouší najít nejlepší hyperparametry pro `DecisionTree`, `RandomForest` a `SupportVectorMachines` na daných datech a následně vytvoří modely s těmito parametry. Pro `DecisionTree` (v rámci metody `BuildDT`) a `SupportVectorMachines` (metoda `TuneParamsForSVM`) je pro optimalizaci hyperparametrů použita 3, 4 a 5 `fold` `CrossValidation` (`sklearn.model_selection.GridSearchCV`). Pro `RandomForest` jsou nejprve odhadnuty hyperparametry metodou `sklearn.model_selection.RandomizedSearchCV`. Na základě výstupu této metody je pak sestavena sada parametrů, které jsou předloženy metodě (`sklearn.model_selection.GridSearchCV`) k vyzkoušení. 
+
+Metody  `BuildDT` a  `TuneParamsForSVM` pro daný `labelColumn` a `dataMatrix` vrací model s nejlepšími nalezenými parametry.
+
+Příklad `DecisionTree`:
 
 ![decisionTree](https://github.com/prusovak2/Drone/blob/master/OutputStages/Graphs/frontBackDT.png)
 
+### `ConfusionMatrix`
 
+Pro základní validaci kvality modelu slouží metoda `CreateConfusionMatrix` z modulu `ConfusionMatrix`. Pro daný `labelColumn` (defaultně `'leftRight'`, `'fronBack'` či `'angular'`), vytvořený a natrénovaný model a `dataMatrix`, na které nebyl model trénován, vytvoří `confusionMatrix` (metoda `sklearn.metrics.plot_confusion_matrix`) znázorňující, jak dobře model predikuje `labels` dat, na kterých nebyl trénován. Metoda jako volitelný parametr přijímá `scaler` (`sklearn.preprocessing.StandardScaler`), kterým byla standardizována trénovací data pro daný model a (pokud byl předán) použije ho ke standardizaci testovacích dat.
+
+Příklad volání metody:
+
+```python
+CreateConfusionMatrix('leftRight', dataForCM, bdt.DTleftRight, "leftRightCM", plt.cm.Blues)
+```
+
+Výsledná ConfusionMatrix:
+
+![confusionMatrix](https://github.com/prusovak2/Drone/blob/master/OutputStages/Graphs/leftRightCM.png)
 
 
 
