@@ -93,7 +93,11 @@ merged = ReadResampleMerge('InputData\\commands.tsv', 'InputData\\navdata.tsv', 
 mergedSecondSet = ReadResampleMerge('InputData\\cmdsSecondSet.tsv', 'InputData\\navdataSecondSetTABS.tsv', '50ms')
 ```
 
+[resampledCMDs](https://github.com/prusovak2/Drone/blob/master/OutputStages/resampledCmds.tsv)
 
+[resampledNavdata](https://github.com/prusovak2/Drone/blob/master/OutputStages/resampledNav.tsv)
+
+[merged](https://github.com/prusovak2/Drone/blob/master/OutputStages/mergedResampled.tsv)
 
 ### `CreateDataMatrix`
 
@@ -133,8 +137,8 @@ def CreateDataFrameForDTMatrixShift(inputDFmerged, intervalLen=40, representantS
 
 Parametr `intervalLen` určuje, kolik záznamů ve zmergovaných datech má tvořit interval, ze kterého je spočítán jeden záznam ve výsledné `dataMatrix`. Parametr `representantSampleShift` říká, kolikátý záznam z intervalu má poskytnout čas a hodnoty `Commands` pro záznam v `dataMatrix` vytvořený na základě tohoto intervalu. 
 
-Zajímavým parametrem je `funcArrayToCreateContent`. Ten umožňuje nastavit, jakými funkcemi mají být data z intervalu zpracována do `features` výsledné `dataMatrix` (místo defaultních `mean`, `std`,`fft(mean)`, `fft(std)` ze sloupců `Roll`, `Pitch` a `Yaw`). Jako tento parametr musí být předáno pole tříčlenných dictionaries. Každé dílčí dictionary určuje jeden feature sloupec výsledné dataMatrix. Dictionary musí obsahovat klíče 'Name', 'Func', a  'Column'. Name určuje jméno sloupce v dataMatrix, do kterého má být hodnota vyplněna. Musí odpovídat některému ze jmen sloucpů v ColumnNames. Hodnota Func má být delegát na funkci, kterou jsou hodnoty z intervalu zpracovány do jedné hodnoty v dataMatrix. Column říká, z jakého sloupce ze vstupního (zmergovaného) dataFrame mají být argumenty pro funkci brány.
-Příklad, jak může hodnota argumentu funcArrayToCreateContent vypadat:
+Zajímavým parametrem je `funcArrayToCreateContent`. Ten umožňuje nastavit, jakými funkcemi mají být data z intervalu zpracována do `features` výsledné `dataMatrix` (místo defaultních `mean`, `std`,`fft(mean)`, `fft(std)` ze sloupců `Roll`, `Pitch` a `Yaw`). Jako tento parametr musí být předáno pole tříčlenných `Dictionaries`. Každé dílčí `Dictionary` určuje jeden `feature` sloupec výsledné `dataMatrix`. `Dictionary` musí obsahovat klíče `'Name'`, `'Func'`, a  `'Column'`. Name určuje jméno sloupce v `dataMatrix`, do kterého má být hodnota vyplněna. Musí odpovídat některému ze jmen sloupců v `ColumnNames`. Hodnota `Func` má být delegát na funkci, kterou jsou hodnoty z intervalu zpracovány do jedné hodnoty v `dataMatrix`. `Column` říká, z jakého sloupce ze vstupního (zmergovaného) `dataFrame` mají být argumenty pro funkci brány.
+Příklad, jak může hodnota argumentu `funcArrayToCreateContent` vypadat:
 
 ```python
 namesAndFunc = [{'Name': 'Roll_Mean', 'Func': np.mean, 'Column': 'Roll_x'}, {'Name': 'Roll_SD', 'Func': np.std, 'Column': 'Roll_x'},
@@ -152,3 +156,9 @@ funcParamsData.to_csv('OutputStages\\funcParamData.tsv', sep='\t')
 ```
 
 [Výsledný soubor](https://github.com/prusovak2/Drone/blob/master/OutputStages/funcParamData.tsv)
+
+Tento způsob určování funkcí pro zpracování dat z intervalů do `feature` hodnot má své omezení v tom, že umožňuje jako argumenty funkci předat pouze data přímo ze zmergovaného `dataFrame`. Není tedy možno hodnotu ve sloupci založit na hodnotě jiného sloupce v `dataMatrix` (např. počítat `fft(mean)`). Pro složitější způsoby počítání hodnot ve sloupcích `dataMatrix` doporučuji uživateli si napsat vlastní metodu podobnou metodě `CreateDataWithRealAndImagPart` (ve které určí, jak se mají sloupce vyplňovat) a tu pak předat metodě `CreateDataFrameForDTMatrix` jako argument `functionToCreateContent`.
+
+### Machine learning modely
+
+ 
