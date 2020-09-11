@@ -12,15 +12,17 @@ from BuildDT import GetFeatures
 from CreateDataMatrixForDT import dataForDTRealImagFrozenDict as dataForRF
 from ConfusionMatrix import CreateConfusionMatrix
 from CreateDataMatrixForDT import dataForCM
-"""
-rf = RandomForestClassifier(random_state = 42)
-# Look at parameters used by our current forest
-print('Parameters currently in use:\n')
-pprint(rf.get_params())
-"""
 
+# given dataMatrix created in CreateDataMatrixForDT modul, this modul attempts to tune hyperparameters for a RandomForest
+# and subsequently creates RandomForest with the best hyperparameters found
 
 def GetBestParamsRandomSearch(x_train, y_train):
+	"""
+	RandomizedSearchCV to estimate the best hyperparameter combination for a RandomForestClassifier
+	:param x_train: train features
+	:param y_train: train labels
+	:return: RandomForest with the best hyperparameters found
+	"""
 	# Use the random grid to search for best hyperparameters
 	# First create the base model to tune
 	rf = RandomForestClassifier()
@@ -62,6 +64,14 @@ def GetBestParamsRandomSearch(x_train, y_train):
 
 
 def GetBestParamsGridSearch(paramGridBasedOnRandomSearch, x_train, y_train):
+	"""
+	provided a param grid based on the best hyperparameters found by GetBestParamsRandomSearch tries all possible combinations
+	of hyperparametres and finds the best one, uses 3 fold cross validation
+	:param paramGridBasedOnRandomSearch:
+	:param x_train:
+	:param y_train:
+	:return: RandomForest with the best hyperparameters found
+	"""
 	grid_search = GridSearchCV(estimator=rf, param_grid=paramGridBasedOnRandomSearch,
 							   cv=3, n_jobs=-1, verbose=2)
 	grid_search = FitRF(x_train, y_train, grid_search)
@@ -69,6 +79,12 @@ def GetBestParamsGridSearch(paramGridBasedOnRandomSearch, x_train, y_train):
 	return grid_search.best_estimator_
 
 def TrainTestSplit(labelColumn, dataMatrix):
+	"""
+	splits data from data matrix into train features, train labels, test features and test labels
+	:param labelColumn:
+	:param dataMatrix:
+	:return:
+	"""
 	labels = GetLabel(labelColumn, dataMatrix)
 	features = GetFeatures(dataMatrix)
 	x_train, x_test, y_train, y_test = train_test_split(features, labels, test_size=0.10, stratify=labels,
@@ -77,6 +93,12 @@ def TrainTestSplit(labelColumn, dataMatrix):
 
 
 def GetLabelAndFeatureData(labelColumnName, dataMatrix):
+	"""
+	splits data from dataMatrix into features and labels
+	:param labelColumnName:
+	:param dataMatrix:
+	:return:
+	"""
 	labels = GetLabel(labelColumnName, dataMatrix)
 	features = GetFeatures(dataMatrix)
 	y = labels[:]
@@ -85,12 +107,20 @@ def GetLabelAndFeatureData(labelColumnName, dataMatrix):
 
 
 def FitRF(x_train, y_train, forest):
+	"""
+	trains given estimator on given data
+	:param x_train: train features
+	:param y_train: train labels
+	:param forest: estimator to train
+	:return: trained estimator
+	"""
 	y_train = np.ravel(y_train)
 	forest.fit(x_train, y_train)
 	return forest
 
 
 if __name__ == "__main__":
+	# as bestEstimatorRandom and GetBestParamsGridSearch methods run too long, their return values are hardcoded here
 	# ########################################## LEFT RIGHT ##################################
 	# estimate some value of hyperparameters
 	X, y = GetLabelAndFeatureData('leftRight', dataForRF)
