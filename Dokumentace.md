@@ -177,26 +177,26 @@ Příklad volání metody:
 CreateConfusionMatrix('leftRight', dataForCM, bdt.DTleftRight, "leftRightCM", plt.cm.Blues)
 ```
 
-Výsledná ConfusionMatrix:
+Výsledná `ConfusionMatrix`:
 
 ![confusionMatrix](https://github.com/prusovak2/Drone/blob/master/OutputStages/Graphs/leftRightCM.png)
 
 ### `PreprocessingImprovements`
 
-Tento modul se zaměřuje na hledání optimálního způsobu předzpracování dat o dronu pro machine learning modely. Konkrétně se snaží najít nejlepší délku intervalu záznamů ve zmergovaných datech, ze kterého má být vytvořen jeden záznam v dataMatrix a nejlepší pozici záznamu v rámci tohoto intervalu, jímž má být interval reprezentován (časem a Commandem). 
+Tento modul se zaměřuje na hledání optimálního způsobu předzpracování dat o dronu pro machine learning modely. Konkrétně se snaží najít nejlepší délku intervalu záznamů ve zmergovaných datech, ze kterého má být vytvořen jeden záznam v `dataMatrix` a nejlepší pozici záznamu v rámci tohoto intervalu, jímž má být interval reprezentován (časem a `Commandem`). 
 
-Metoda EvaluateModels pro daná již předzpracovaná data vytvoří DecisionTree a SupportVectorMachine (včetně odladění hyperparametrů) a vyhodnotí, jak dobře modely naučené na takto předzpracovabých datech predikují labely dat, na kterých nebyly trénovány. Tato metoda má poskytovat informaci o smyslupnosti konktrítního způsobu předzpracovaní zmergovaných dat to dataMatrix.
+Metoda `EvaluateModels` pro daná již předzpracovaná data vytvoří `DecisionTree` a `SupportVectorMachine` (včetně odladění hyperparametrů) a vyhodnotí, jak dobře modely naučené na takto předzpracovaných datech predikují `labels` dat, na kterých nebyly trénovány. Tato metoda má poskytovat informaci o smysluplnosti konkrétního způsobu předzpracovaní zmergovaných dat to `dataMatrix`.
 
-Metoda TryShiftsForOneLabel obdrží horní a dolní mez pro index reprezentující vzorku v rámci intervalu. V rámci n iterací vytvoří n dataMatrices (kde n je počet vzoků mezi dolní a horní mezí pro výběr reprezentanta) a pro každou metodou EvaluateModels ohodnotí, jak dobře na ní machine learning funguje. Skóre všech dílčích ML modelů vypisuje do souboru. Metoda se zaměřuje na hodnocení kvality predikce jednoho z label sloupců.
+Metoda `TryShiftsForOneLabel` obdrží horní a dolní mez pro index reprezentující vzorku v rámci intervalu. V rámci `n` iterací vytvoří `n` `dataMatrices` (kde `n` je počet vzorků mezi dolní a horní mezí pro výběr reprezentanta) a pro každou z nich metodou `EvaluateModels` ohodnotí, jak dobře na ní machine learning funguje. Skóre všech dílčích ML modelů vypisuje do souboru. Metoda se zaměřuje na hodnocení kvality predikce jednoho z `label` sloupců.
 
 [Příklad výstupu metody `TryShiftsForOneLabel`](https://github.com/prusovak2/Drone/blob/master/OutputStages/scoresShiftLeftRight.txt) 
 
-Podobně funguje metoda TryIntervalLenghtsOneLabel s tím rozdílem, že se pokouší nalézt nejlepší délku intervalu 9 (počet záznamů ve zmergovaných datech, které mají být sloučeny do jednoho záznamu v dataMatrix). 
+Podobně funguje metoda `TryIntervalLenghtsOneLabel` s tím rozdílem, že se pokouší nalézt nejlepší délku intervalu (počet záznamů ve zmergovaných datech, které mají být sloučeny do jednoho záznamu v `dataMatrix`). 
 
 [Příklad výstupu metody `TryIntervalLenghtsOneLabel`](https://github.com/prusovak2/Drone/blob/master/OutputStages/scoresShiftLeftRight.txt) 
 
-Metody TryShiftsForAllLabels a TryIntervalLensForAllLabels hodnotí danou variantu předzpracování dat při předpovídání všech label sloupců. Předzpracují data daným způsobem (s danou délkou intervalu či indexem reprezentanta) a vytvoří pro ně DecisionTree a SVM a ohodnotí jejich výkon při předpovídání všech label sloupců. Výsledná skóre zprůměrují do celkového skóre modelu na dané variantě dat.
+Metody `TryShiftsForAllLabels` a `TryIntervalLensForAllLabels` hodnotí danou variantu předzpracování dat při předpovídání všech `label` sloupců. Předzpracují data daným způsobem (s danou délkou intervalu či indexem reprezentanta), vytvoří pro ně `DecisionTree` a `SVM` a ohodnotí jejich výkon při předpovídání všech label sloupců. Výsledná skóre zprůměrují do celkového skóre modelu na dané variantě dat.
 
-[Příklad výstupu metody `TryIntervalLensForAllLabels`](https://github.com/prusovak2/Drone/blob/master/OutputStages/scoresIntervalLenghtsAllLabels.txt)
+[Příklad výstupu metody`TryIntervalLensForAllLabels`](https://github.com/prusovak2/Drone/blob/master/OutputStages/scoresIntervalLenghtsAllLabels.txt)
 
-**** úvaha nakonec o nejlepších délkách ashiftech
+[Příklad výstupu metody  `TryShiftsForAllLabels`](https://github.com/prusovak2/Drone/blob/master/OutputStages/scoresShiftAllLabels.txt)
