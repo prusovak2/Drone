@@ -84,7 +84,7 @@ def BuildDT(labelColumn, dataMatrix):
     # prepare pipeline, that carries out a data standartization - to make a features have a variance in a same order
     # and creates DT
     scaler = StandardScaler()
-    pipe_steps = [('scaler', scaler), ('MLmodel', DecisionTreeClassifier())]
+    pipe_steps = [('scaler', scaler), ('decisionTree', DecisionTreeClassifier())]
     pipeline = Pipeline(pipe_steps)
     print(pipeline)
     print(pipeline.get_params().keys())
