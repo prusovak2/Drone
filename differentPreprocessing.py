@@ -1,6 +1,9 @@
 from collections import Counter as C
 import numpy as np
 import pandas as pd
+from sklearn.tree import DecisionTreeClassifier
+from CreateDataMatrix import MakeCMDsDiscreteWithFrozenDict, frozenCmds
+from sklearn.model_selection import train_test_split
 import sklearn.tree
 import random
 
@@ -90,11 +93,12 @@ def PrepareData(cmdFileName, navdataFileName):
         labelled[i].selected_navdata = data
         i += 1
 
-    dataColumnNamesRealImag = ['leftRight', 'frontBack', 'angular', 'Roll_Mean', 'Roll_SD', 'Roll_FFT_Mean_Real',
+        dataColumnNamesRealImag = ['leftRight', 'frontBack', 'angular', 'Roll_Mean', 'Roll_SD', 'Roll_FFT_Mean_Real',
                                'Roll_FFT_Mean_Imag',
                                'Roll_FFT_SD', 'Pitch_Mean', 'Pitch_SD', 'Pitch_FFT_Mean_Real', 'Pitch_FFT_Mean_Imag',
                                'Pitch_FFT_SD',
                                'Yaw_Mean', 'Yaw_SD', 'Yaw_FFT_Mean_Real', 'Yaw_FFT_Mean_Imag', 'Yaw_FFT_SD']
+
 
     numRecords = len(labelled)
     ind = list()
@@ -109,9 +113,9 @@ def PrepareData(cmdFileName, navdataFileName):
 
     index = 0
     for timeFrame in labelled:
-        dataMatrix.leftRight[index] = timeFrame.most_common_commands[cmdTranslate['leftRight']]
-        dataMatrix.frontBack[index] = timeFrame.most_common_commands[cmdTranslate['frontBack']]
-        dataMatrix.angular[index] = timeFrame.most_common_commands[cmdTranslate['angular']]
+        dataMatrix.leftRight[index] = float(timeFrame.most_common_commands[cmdTranslate['leftRight']])
+        dataMatrix.frontBack[index] = float(timeFrame.most_common_commands[cmdTranslate['frontBack']])
+        dataMatrix.angular[index] = float(timeFrame.most_common_commands[cmdTranslate['angular']])
 
         means = timeFrame.selected_navdata.mean(axis=0)
         dataMatrix.Roll_Mean[index] = means[navdataTranslate['Roll']]
@@ -122,7 +126,7 @@ def PrepareData(cmdFileName, navdataFileName):
         dataMatrix.Roll_SD[index] = stds[navdataTranslate['Roll']]
         dataMatrix.Pitch_SD[index] = stds[navdataTranslate['Pitch']]
         dataMatrix.Yaw_SD[index] = stds[navdataTranslate['Yaw']]
-
+        
         rollFFT = np.fft.fft(timeFrame.selected_navdata[:, navdataTranslate['Roll']])
         rollFFtmean = np.mean(rollFFT)
         dataMatrix.Roll_FFT_Mean_Real[index] = rollFFtmean.real
@@ -146,12 +150,91 @@ def PrepareData(cmdFileName, navdataFileName):
 
         index += 1
 
-    return dataMatrix
+    newDataMatrix = dataMatrix
+    for i in ind:
+        MakeCMDsDiscreteWithFrozenDict(i, dataMatrix, newDataMatrix)
+
+    return newDataMatrix
+
+def GetLabel(labelColumn, dataMatrix):
+    '''
+    separates a column to be predicted
+    :param labelColumn:
+    :param dataMatrix:
+    :return: selected label column
+    '''
+    labels = dataMatrix[[labelColumn]]
+    return labels
+
+def GetFeatures(dataMatrix):
+    '''
+    separates columns to base a prediction on
+    :param dataMatrix:
+    :return: feature columns
+    '''
+    features = dataMatrix.drop(['leftRight', 'frontBack', 'angular'], axis=1)
+    return features
 
 dataMatrix = PrepareData('InputData\\commands.tsv', 'InputData\\navdata.tsv')
 validationData = PrepareData('InputData\\commandsCM.tsv', 'InputData\\navdataCMTABS.tsv')
 dataMatrix.to_csv('OutputStages\\differentApproach.tsv', sep='\t')
 validationData.to_csv('OutputStages\\differentApproachCM.tsv', sep='\t')
+
+# build DT
+decisionTree = DecisionTreeClassifier(criterion='gini', max_depth=4, class_weight='balanced')
+features_train = GetFeatures(validationData)
+labels_train = GetLabel('leftRight', validationData)
+
+decisionTree.fit(features_train, labels_train)
+
+features_test = GetFeatures(dataMatrix)
+labels_test = GetLabel('leftRight', dataMatrix)
+disp = plot_confusion_matrix(decisionTree, features_test, labels_test,
+                             display_labels=[*frozenCmds.values()],
+                             cmap=plt.cm.Blues,
+                             normalize=None)
+disp.ax_.set_title("leftRight")
+print('leftRight')
+print(disp.confusion_matrix)
+plt.show()
+plt.close()
+
+features_train = GetFeatures(validationData)
+labels_train = GetLabel('frontBack', validationData)
+
+decisionTree.fit(features_train, labels_train)
+
+features_test = GetFeatures(dataMatrix)
+labels_test = GetLabel('frontBack', dataMatrix)
+disp = plot_confusion_matrix(decisionTree, features_test, labels_test,
+                             display_labels=[*frozenCmds.values()],
+                             cmap=plt.cm.Blues,
+                             normalize=None)
+disp.ax_.set_title("frontBack")
+print('frontBack')
+print(disp.confusion_matrix)
+plt.show()
+plt.close()
+
+features_train = GetFeatures(validationData)
+labels_train = GetLabel('angular', validationData)
+
+decisionTree.fit(features_train, labels_train)
+
+features_test = GetFeatures(dataMatrix)
+labels_test = GetLabel('angular', dataMatrix)
+disp = plot_confusion_matrix(decisionTree, features_test, labels_test,
+                             display_labels=[*frozenCmds.values()],
+                             cmap=plt.cm.Blues,
+                             normalize=None)
+disp.ax_.set_title("angular")
+print('angular')
+print(disp.confusion_matrix)
+plt.show()
+plt.close()
+
+
+
 
 '''
 random.seed(33) #does not seem to work reliably.
