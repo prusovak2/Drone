@@ -2,13 +2,15 @@ from differentPreprocessing import PrepareData
 from pprint import pprint
 import pandas as pd
 from sklearn.tree import DecisionTreeClassifier
-from CreateDataMatrix import MakeCMDsDiscreteWithFrozenDict, frozenCmds
+#from CreateDataMatrix import MakeCMDsDiscreteWithFrozenDict, frozenCmds
 from sklearn.metrics import plot_confusion_matrix
 import matplotlib.pyplot as plt
 from differentPreprocessing import GetLabel,GetFeatures
 from BuildDT import BuildDT
 from ConfusionMatrix import CreateConfusionMatrix
 from SupportVectorMachines import TuneParamsForSVM
+from BuildRandomForest import GetLabelAndFeatureData, GetBestParamsRandomSearch, FitRF
+from sklearn.ensemble import RandomForestClassifier
 
 class Dataset:
 	def __init__(self, navdataFileName, cmdsFileName, datasetName):
@@ -68,6 +70,11 @@ for label in labels:
 	CreateConfusionMatrix(label,testMatrix,dt,'DT '+label, plt.cm.Blues, time=False)
 	svm, scaler,_,_ = TuneParamsForSVM(label, trainMatrix, False)
 	CreateConfusionMatrix(label, testMatrix, svm, 'SVM ' + label, plt.cm.Blues, time=False, scaler=scaler)
+
+	rf = RandomForestClassifier()
+	X, y = GetLabelAndFeatureData(label,trainMatrix,False)
+	rf = FitRF(X, y, rf)
+	CreateConfusionMatrix(label, testMatrix, rf, 'RF '+ label, plt.cm.Blues, time=False)
 
 """
 decisionTree = DecisionTreeClassifier(criterion='gini', max_depth=4, class_weight='balanced')
