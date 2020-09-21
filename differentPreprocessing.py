@@ -3,13 +3,10 @@ import numpy as np
 import pandas as pd
 from sklearn.tree import DecisionTreeClassifier
 from CreateDataMatrix import MakeCMDsDiscreteWithFrozenDict, frozenCmds
-from sklearn.model_selection import train_test_split
-import sklearn.tree
-import random
 
+#from CreateDataMatrix import frozenCmds
 from sklearn.metrics import plot_confusion_matrix
 import matplotlib.pyplot as plt
-#from CreateDataMatrix import frozenCmds
 from pprint import pprint
 
 class TimeFrame:
@@ -21,7 +18,7 @@ class TimeFrame:
         """
         all cmds in particular 250 ms long interval
         """
-        self.commands=[]
+        self.commands = []
         """
         all navdata in particular 250 ms long interval
         """
@@ -128,9 +125,12 @@ def PrepareData(cmdFileName, navdataFileName):
         labelled[i].most_common_commands = labels
 
         # pick roll, pitch and yaw from navdata
-        data = np.array(labelled[i].navdata)[:, 12:15]
-        labelled[i].selected_navdata = data
-        i += 1
+        if len(labelled[i].navdata) < 5:
+            del labelled[i]
+        else:
+            data = np.array(labelled[i].navdata)[:, 12:15]
+            labelled[i].selected_navdata = data
+            i += 1
 
     # insert data into pandas DataFrame
     dataColumnNamesRealImag = ['leftRight', 'frontBack', 'angular', 'Roll_Mean', 'Roll_SD', 'Roll_FFT_Mean_Real',
@@ -224,60 +224,61 @@ def GetFeatures(dataMatrix):
     features = dataMatrix.drop(['leftRight', 'frontBack', 'angular'], axis=1)
     return features
 
-dataMatrix = PrepareData('InputData\\commands.tsv', 'InputData\\navdata.tsv')
-validationData = PrepareData('InputData\\commandsCM.tsv', 'InputData\\navdataCMTABS.tsv')
-dataMatrix.to_csv('OutputStages\\differentApproach.tsv', sep='\t')
-validationData.to_csv('OutputStages\\differentApproachCM.tsv', sep='\t')
+if __name__ == "__main__":
+    dataMatrix = PrepareData('InputData\\commands.tsv', 'InputData\\navdata.tsv')
+    validationData = PrepareData('InputData\\commandsCM.tsv', 'InputData\\navdataCMTABS.tsv')
+    dataMatrix.to_csv('OutputStages\\differentApproach.tsv', sep='\t')
+    validationData.to_csv('OutputStages\\differentApproachCM.tsv', sep='\t')
 
-# build DT
-decisionTree = DecisionTreeClassifier(criterion='gini', max_depth=4, class_weight='balanced')
-features_train = GetFeatures(validationData)
-labels_train = GetLabel('leftRight', validationData)
+    # build DT
+    decisionTree = DecisionTreeClassifier(criterion='gini', max_depth=4, class_weight='balanced')
+    features_train = GetFeatures(validationData)
+    labels_train = GetLabel('leftRight', validationData)
 
-decisionTree.fit(features_train, labels_train)
+    decisionTree.fit(features_train, labels_train)
 
-features_test = GetFeatures(dataMatrix)
-labels_test = GetLabel('leftRight', dataMatrix)
-disp = plot_confusion_matrix(decisionTree, features_test, labels_test,
-                             display_labels=[*frozenCmds.values()],
-                             cmap=plt.cm.Blues,
-                             normalize=None)
-disp.ax_.set_title("leftRight")
-print('leftRight')
-print(disp.confusion_matrix)
-plt.show()
-plt.close()
+    features_test = GetFeatures(dataMatrix)
+    labels_test = GetLabel('leftRight', dataMatrix)
+    disp = plot_confusion_matrix(decisionTree, features_test, labels_test,
+                                 display_labels=[*frozenCmds.values()],
+                                 cmap=plt.cm.Blues,
+                                 normalize=None)
+    disp.ax_.set_title("leftRight")
+    print('leftRight')
+    print(disp.confusion_matrix)
+    plt.show()
+    plt.close()
 
-features_train = GetFeatures(validationData)
-labels_train = GetLabel('frontBack', validationData)
+    features_train = GetFeatures(validationData)
+    labels_train = GetLabel('frontBack', validationData)
 
-decisionTree.fit(features_train, labels_train)
+    decisionTree.fit(features_train, labels_train)
 
-features_test = GetFeatures(dataMatrix)
-labels_test = GetLabel('frontBack', dataMatrix)
-disp = plot_confusion_matrix(decisionTree, features_test, labels_test,
-                             display_labels=[*frozenCmds.values()],
-                             cmap=plt.cm.Blues,
-                             normalize=None)
-disp.ax_.set_title("frontBack")
-print('frontBack')
-print(disp.confusion_matrix)
-plt.show()
-plt.close()
+    features_test = GetFeatures(dataMatrix)
+    labels_test = GetLabel('frontBack', dataMatrix)
+    disp = plot_confusion_matrix(decisionTree, features_test, labels_test,
+                                 display_labels=[*frozenCmds.values()],
+                                 cmap=plt.cm.Blues,
+                                 normalize=None)
+    disp.ax_.set_title("frontBack")
+    print('frontBack')
+    print(disp.confusion_matrix)
+    plt.show()
+    plt.close()
 
-features_train = GetFeatures(validationData)
-labels_train = GetLabel('angular', validationData)
+    features_train = GetFeatures(validationData)
+    labels_train = GetLabel('angular', validationData)
 
-decisionTree.fit(features_train, labels_train)
+    decisionTree.fit(features_train, labels_train)
 
-features_test = GetFeatures(dataMatrix)
-labels_test = GetLabel('angular', dataMatrix)
-disp = plot_confusion_matrix(decisionTree, features_test, labels_test,
-                             display_labels=[*frozenCmds.values()],
-                             cmap=plt.cm.Blues,
-                             normalize=None)
-disp.ax_.set_title("angular")
-print('angular')
-print(disp.confusion_matrix)
-plt.show()
-plt.close()
+    features_test = GetFeatures(dataMatrix)
+    labels_test = GetLabel('angular', dataMatrix)
+    disp = plot_confusion_matrix(decisionTree, features_test, labels_test,
+                                 display_labels=[*frozenCmds.values()],
+                                 cmap=plt.cm.Blues,
+                                 normalize=None)
+    disp.ax_.set_title("angular")
+    print('angular')
+    print(disp.confusion_matrix)
+    plt.show()
+    plt.close()
