@@ -13,11 +13,16 @@ from BuildRandomForest import GetLabelAndFeatureData, GetBestParamsRandomSearch,
 from sklearn.ensemble import RandomForestClassifier
 
 class Dataset:
+	"""
+	represents a pair of corresponding navdata and commands files
+	"""
 	def __init__(self, navdataFileName, cmdsFileName, datasetName):
 		self.NavdataFile = navdataFileName
 		self.CommandsFile = cmdsFileName
 		self.DatasetName = datasetName
 
+# create Dataset instances for all file pairs
+# and divide them into train and test data
 Datasets = []
 basic = Dataset('InputData\\navdata.tsv', 'InputData\\commands.tsv', 'basic')
 Datasets.append(basic)
@@ -42,7 +47,7 @@ for file in files:
 
 Datasets.append(Dataset(fileNameStart+'angular'+filenameEndNAVDATA, fileNameStart+file+filenameEndCMDs, file))
 
-
+# create dataMatrices
 DataMatrices = []
 for dataset in Datasets:
 	matrix = PrepareData(dataset.CommandsFile, dataset.NavdataFile)
@@ -53,6 +58,7 @@ for dataset in testDatasets:
 	matrix = PrepareData(dataset.CommandsFile, dataset.NavdataFile)
 	TestDataMatrices.append(matrix)
 
+# concat all dataMatrices into two large datamatrices (train and test one)
 trainMatrix = pd.concat(DataMatrices)
 testMatrix = pd.concat(TestDataMatrices)
 trainMatrix.reset_index(drop=True, inplace=True)
@@ -64,6 +70,7 @@ testMatrix.to_csv('OutputStages\\testMatrix.tsv', sep='\t')
 print(len(DataMatrices))
 pprint(DataMatrices)
 
+# for large dataMatrices create all ML models and evaluate their performance
 labels = ['leftRight', 'frontBack', 'angular']
 for label in labels:
 	dt,_,_,_,_ = BuildDT(label, trainMatrix, False)
