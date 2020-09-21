@@ -50,6 +50,8 @@ def GetBestParamsRandomSearch(x_train, y_train):
 				   'bootstrap': bootstrap}
 	print("RANDOM GRID")
 	pprint(random_grid)
+	with open('OutputStages\\randomParams.txt', 'w') as f:
+		pprint(random_grid, stream=f)
 
 	# Random search of parameters, using 3 fold cross validation,
 	# search across 100 different combinations, and use all available cores
@@ -92,14 +94,14 @@ def TrainTestSplit(labelColumn, dataMatrix):
 	return x_train, x_test, y_train, y_test
 
 
-def GetLabelAndFeatureData(labelColumnName, dataMatrix):
+def GetLabelAndFeatureData(labelColumnName, dataMatrix, time=True):
 	"""
 	splits data from dataMatrix into features and labels
 	:param labelColumnName:
 	:param dataMatrix:
 	:return:
 	"""
-	labels = GetLabel(labelColumnName, dataMatrix)
+	labels = GetLabel(labelColumnName, dataMatrix, time)
 	features = GetFeatures(dataMatrix)
 	y = labels[:]
 	X = features.values

@@ -4,6 +4,11 @@ from pprint import pprint
 import matplotlib.pyplot as plt
 
 def CreateHistogram(CMDfilename):
+	"""
+	for given command file creates histogram showing frequency of each command
+	:param CMDfilename:
+	:return:
+	"""
 	cmdsColumnNames = ['time', 'leftRight', 'frontBack', 'up', 'angular']
 	cmds = pd.read_csv(CMDfilename, delimiter='\t', header=None, names=cmdsColumnNames)
 
@@ -30,22 +35,22 @@ def CreateHistogram(CMDfilename):
 	plt.show()
 
 
+if __name__ == "__main__":
+	files = [
+		'InputData\\commands.tsv',
+		'InputData\\commandsCM.tsv',
+		'InputData\\cmdsSecondSet.tsv',
+		'InputData\\cmdsSecondCM.tsv',
+		'InputData\\leftRightCMDS.tsv',
+	]
 
-files = [
-	'InputData\\commands.tsv',
-	'InputData\\commandsCM.tsv',
-	'InputData\\cmdsSecondSet.tsv',
-	'InputData\\cmdsSecondCM.tsv',
-	'InputData\\leftRightCMDS.tsv',
-]
+	fileNameStart = 'InputData\\myOwndata\\'
+	filenameEndCMDs = '\\commands.tsv'
+	names = ['angular', 'drone_data', 'drone_data3', 'frontBack', 'sada2', 'straight', 'straight4', 'straightAllSides', 'straightAllSidesBetter']
 
-fileNameStart = 'InputData\\myOwndata\\'
-filenameEndCMDs = '\\commands.tsv'
-names = ['angular', 'drone_data', 'drone_data3', 'frontBack', 'sada2', 'straight', 'straight4', 'straightAllSides', 'straightAllSidesBetter']
+	for name in names:
+		fileName = fileNameStart+name+filenameEndCMDs
+		files.append(fileName)
 
-for name in names:
-	fileName = fileNameStart+name+filenameEndCMDs
-	files.append(fileName)
-
-for fileName in files:
-	CreateHistogram(fileName)
+	for fileName in files:
+		CreateHistogram(fileName)
