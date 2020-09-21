@@ -82,6 +82,7 @@ def ReadResampleMerge(cmdsFilename, navdataFilename, frequency='50ms', cmdOutput
     if navdataOutputTsvFilename is not None:
         resampledNav.to_csv(navdataOutputTsvFilename, sep='\t')
 
+    # preparedCMDS = PrepareCommands(resampledNav,resampledCmds)
     # MERGE INPUT DATA
     # how inner - intersection, keeps only times that do have corresponding counterpart in second file
     merged = pd.merge(resampledCmds, resampledNav, right_index=True, left_index=True,
@@ -103,6 +104,38 @@ def addTabs(filename, outputFile):
         with open(outputFile, mode='w') as output:
             for line in input:
                 output.write('\t'+line)
+
+
+
+def PrepareCommands(resampledNav, resampledCMDS):
+    columnNames = ['time', 'leftRight', 'frontBack', 'up', 'angular']
+    ind = resampledNav.index
+    newCommands = pd.DataFrame(columns=columnNames, index=ind)
+    currentTime = resampledCMDS.index[0]
+    lastSmallerTime = currentTime
+    i = 0
+    for navTime in ind:
+        while currentTime <= navTime:
+            lastSmallerTime = currentTime
+            i+=1
+            if i < resampledCMDS.index.size:
+                currentTime = resampledCMDS.index[i]
+            else:
+                break
+
+        newCommands.leftRight[navTime] = resampledCMDS.leftRight[lastSmallerTime]
+        newCommands.frontBack[navTime] = resampledCMDS.frontBack[lastSmallerTime]
+        newCommands.up[navTime] = resampledCMDS.up[lastSmallerTime]
+        newCommands.angular[navTime] = resampledCMDS.angular[lastSmallerTime]
+    return newCommands
+
+'''
+cmds =ReadCMDScvsIntoDFandResample('InputData\\commands.tsv','50ms')
+nav = ReadNAVDATAcsvIntoDFandResample('InputData\\navdata.tsv', '50ms')
+prepCMDS = PrepareCommands(nav, cmds)
+prepCMDS.to_csv('OutputStages\\preparedCMDS.tsv',  sep='\t')
+'''
+
 
 # dataForDTRealImagFrozenDict
 merged = ReadResampleMerge('InputData\\commands.tsv', 'InputData\\navdata.tsv', '50ms', 'OutputStages\\resampledCmds.tsv',
@@ -136,4 +169,8 @@ mergedLeftRight = ReadResampleMerge('InputData\\leftRightCMDS.tsv', 'InputData\\
                                 'OutputStages\\resampledLeftRightCMDS.tsv', 'OutputStages\\resampledLeftRightNAV.tsv',
                               'OutputStages\\mergedResampledLeftRight.tsv')
 
+mergedChanged = ReadResampleMerge('InputData\\commands.tsv', 'InputData\\navdata.tsv', '5ms', 'OutputStages\\resampledCmdsChanged.tsv',
+                           'OutputStages\\resampledNavChanged.tsv', "OutputStages\\mergedResampledChanged.tsv")
+mergedCMChanged = ReadResampleMerge('InputData\\commandsCM.tsv', 'InputData\\navdataCMTABS.tsv', '5ms', 'OutputStages\\resampledCmdsCMChanged.tsv',
+                           'OutputStages\\resampledNavCMChanged.tsv', "OutputStages\\mergedResampledCMChanged.tsv")
 

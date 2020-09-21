@@ -6,6 +6,7 @@ from ReadResampleMerge import mergedCM
 from ReadResampleMerge import mergedSecondSet
 from ReadResampleMerge import mergedSecondCM
 from ReadResampleMerge import mergedLeftRight
+from ReadResampleMerge import mergedChanged, mergedCMChanged
 
 # this modul turn resampled and merged into a matrices go base a machine learning on
 
@@ -294,6 +295,7 @@ def CreateDataFrameForDTMatrix(inputDFmerged, ColumnNames, functionToCreateConte
     :param intervalLen:
     :return: dataFrame to base decision tree on
     '''
+    inputDFmerged.to_csv('OutputStages\\BEFORERESETINDEX.tsv', sep='\t')
     intIndexed = inputDFmerged.reset_index()
     newDF = CreateEmptyDataFrame(intervalLen, intIndexed, ColumnNames)
 
@@ -402,4 +404,16 @@ funcParamsData = CreateDataFrameForDTMatrixShift(inputDFmerged=merged, intervalL
                                                  funcArrayToCreateContent=namesAndFunc, ColumnNames=dataColumnNamesFucParams)
 funcParamsData.to_csv('OutputStages\\funcParamData.tsv', sep='\t')
 
+optimalLengthDataAngularLeftRight = CreateDataFrameForDTMatrixShift(inputDFmerged=merged, intervalLen=36, representantSampleShift=0)
+optimalLenghtDataFrontBack = CreateDataFrameForDTMatrixShift(inputDFmerged=merged, intervalLen=32, representantSampleShift=0)
 
+dataDTchanged = CreateDataFrameForDTMatrix(inputDFmerged=mergedChanged, ColumnNames=dataColumnNamesRealImag,
+                                                         functionToCreateContent=CreateDataWithRealAndImagPart,
+                                                         functionToDiscreteCmds=MakeCMDsDiscreteWithFrozenDict,
+                                                         intervalLen=50)
+dataDTchanged.to_csv('OutputStages\\dataDTchanged.tsv', sep='\t')
+dataForCMchanged = CreateDataFrameForDTMatrix(inputDFmerged=mergedCMChanged, ColumnNames=dataColumnNamesRealImag,
+                                       functionToCreateContent=CreateDataWithRealAndImagPart,
+                                       functionToDiscreteCmds=MakeCMDsDiscreteWithFrozenDict,
+                                       intervalLen=50)
+dataForCMchanged.to_csv('OutputStages\\dataForCMchanged.tsv', sep='\t')

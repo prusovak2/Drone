@@ -7,7 +7,8 @@ import matplotlib.pyplot as plt
 import BuildDT as bdt
 from CreateDataMatrix import dataForCM
 from CreateDataMatrix import frozenCmds
-from CreateDataMatrix import dataDTSecondCM
+from CreateDataMatrix import dataDTSecondCM, dataForCMchanged, dataDTchanged, dataForDTRealImagFrozenDict
+from BuildDT import DTleftRight
 
 
 def CreateConfusionMatrix(labelColumnName, validationDataMatrix, MLmodel, cmTitle, color, scaler=None, showCM=True):
@@ -38,10 +39,22 @@ def CreateConfusionMatrix(labelColumnName, validationDataMatrix, MLmodel, cmTitl
     print(disp.confusion_matrix)
     if showCM is True:
         plt.show()
+    plt.close()
     return features
 
 
 if __name__ == "__main__":
+    CreateConfusionMatrix('leftRight', dataForDTRealImagFrozenDict, bdt.DTleftRightCM, "leftRightCM", plt.cm.Reds)
+    CreateConfusionMatrix('frontBack', dataForDTRealImagFrozenDict, bdt.DTfrontBackCM, "frontBackCM", plt.cm.Reds)
+    CreateConfusionMatrix('angular', dataForDTRealImagFrozenDict, bdt.DTangularCM, "angularCM", plt.cm.Reds)
+
+    CreateConfusionMatrix('leftRight', dataForCMchanged, bdt.decisionTree, "leftRightDT", plt.cm.Reds)
+    CreateConfusionMatrix('leftRight', dataDTchanged, bdt.decisionTree, "leftRightDT", plt.cm.Reds)
+
+    CreateConfusionMatrix('leftRight', dataForCMchanged, bdt.DTleftRightchanged, "leftRightChanged", plt.cm.Reds)
+    CreateConfusionMatrix('frontBack', dataForCMchanged, bdt.DTfrontBackchanged, "frontBackChanged", plt.cm.Reds)
+    CreateConfusionMatrix('angular', dataForCMchanged, bdt.DTangularchanged, "angularChanged", plt.cm.Reds)
+
     CreateConfusionMatrix('leftRight', dataForCM, bdt.DTleftRight, "leftRightCM", plt.cm.Blues)
     CreateConfusionMatrix('frontBack', dataForCM, bdt.DTfrontBack, "frontBackCM", plt.cm.Blues)
     CreateConfusionMatrix('angular', dataForCM, bdt.DTangular, "angularCM", plt.cm.Blues)
@@ -49,4 +62,12 @@ if __name__ == "__main__":
     CreateConfusionMatrix('leftRight', dataDTSecondCM, bdt.DTleftRightSecond, "leftRightCMSecond", plt.cm.Reds)
     CreateConfusionMatrix('frontBack', dataDTSecondCM, bdt.DTfrontBackSecond, "frontBackCMSecond", plt.cm.Reds)
     CreateConfusionMatrix('angular', dataDTSecondCM, bdt.DTangularSecond, "angularCMSecond", plt.cm.Reds)
+
+    CreateConfusionMatrix('leftRight', dataDTSecondCM, bdt.DTleftRightOptimalLen, "leftRightOptimalLen", plt.cm.Reds)
+    CreateConfusionMatrix('frontBack', dataDTSecondCM, bdt.DTfrontBackOptimalLen, "frontBackOptimalLen", plt.cm.Reds)
+    CreateConfusionMatrix('angular', dataDTSecondCM, bdt.DTangularOptimalLen, "angularOptimalLen", plt.cm.Reds)
+
+
+
+
 
