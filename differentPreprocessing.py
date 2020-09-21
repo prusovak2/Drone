@@ -1,4 +1,4 @@
-from collections import Counter as C
+from collections import Counter as Count
 import numpy as np
 import pandas as pd
 from sklearn.tree import DecisionTreeClassifier
@@ -13,20 +13,49 @@ import matplotlib.pyplot as plt
 from pprint import pprint
 
 class TimeFrame:
+    """
+    Class to store 250 ms interval of commands and navdata during preprocessing
+    before functions (mean,std, fft) are used and result is stored in pandas DataFrame
+    """
     def __init__(self):
+        """
+        all cmds in particular 250 ms long interval
+        """
         self.commands=[]
+        """
+        all navdata in particular 250 ms long interval
+        """
         self.navdata=[]
+        """
+        begining of an interval
+        """
         self.initial_time=None
+        """
+        most common cmd in interval represents interval
+        """
         self.most_common_commands=None
+        """
+        only roll, pitch and yaw columns selected from navdata
+        """
         self.selected_navdata=None
 
 
-def select_label(s):
-    return sorted(C(s).items(), key=lambda x: x[1])[-1][0]
+def select_label(listOfLabelVals):
+    """
+    provided values of label from particular interval, returns the most common label value in the interval
+    :param listOfLabelVals:
+    :return:
+    """
+    return sorted(Count(listOfLabelVals).items(), key=lambda x: x[1])[-1][0]
 
-def PrepareData(cmdFileName, navdataFileName):
-    # 1] nactu vsechna navdata a vsechny commands.
-    #    data vzata z InputData/
+
+def ReadData(cmdFileName, navdataFileName):
+    """
+    reads command and navdata files into 2D arrays
+    :param cmdFileName: file containing commands
+    :param navdataFileName: file containing navdata
+    :return: commands array, navdata array
+    """
     navdata = []
     with open(navdataFileName, "r") as f:
         for line in f:
@@ -45,28 +74,41 @@ def PrepareData(cmdFileName, navdataFileName):
             data = line.split("\t")
             commands.append([float(data[0])] + data[1:])
     commands = sorted(commands, key=lambda x: x[0])
+    return commands, navdata
 
-    # 2] preskocim vsechna navdata, ktera jsem nameril pred prvnim commandem
+
+def PrepareData(cmdFileName, navdataFileName):
+    """
+    reads commands and navdata, divides them into 250 ms long intervals,
+    picks the most common cmd from interval to represent interval,
+    counts mean, std, mean and std of fft of roll, pitch and yaw navdata columns within intervals
+    :param cmdFileName: file to read commands from
+    :param navdataFileName: file to read navdata from
+    :return: pandas DataFrame with one row for each 250 ms long interval
+    """
+    commands, navdata = ReadData(cmdFileName, navdataFileName)
+
+    # skip all navdata that were measured before the first cmd
     labelled = []
     i = 0
     j = 0
     while i < len(navdata) and navdata[i][0] < commands[0][0]:
         i += 1
 
-    # 3] rozdelim data do skupinek tak, ze vzdycky vezmu command, a s nim vsechny commandy, ktere jsou do 250 ms po nem,
-    #    a pridam k tomu vsechna navdata, ktera jsem jeste nikam nepriradil, a byla sebrana do 250ms od toho prikazu
-    # Taky to neni idealni zpusob, jak to namatchovat, ale whatever. Navic jsou nektere skupiny daleko, daleko vetsi nez 50 zaznamu.
-
+    # divide navdata and cmds into 250 ms long intervals
     while True:
         tf = TimeFrame()
+        # begining af the interval - time of the first cmd in the interval
         tf.initial_time = commands[j][0]
         tf.commands.append(commands[j])
-        labelled.append(tf)
+        labelled.append(tf)  # list of timeFrames - of all intervals
         j += 1
+        # take all cmds that occured within 250 ms since the first cmd in the interval
         while j < len(commands) and commands[j][0] < labelled[-1].initial_time + 250:
             labelled[-1].commands.append(commands[j])
             j += 1
 
+        # take all navdata that occured within 250 ms since the first cmd in the interval
         while i < len(navdata) and navdata[i][0] < labelled[-1].initial_time + 250:
             labelled[-1].navdata.append(navdata[i])
             i += 1
@@ -74,32 +116,30 @@ def PrepareData(cmdFileName, navdataFileName):
         if (j == len(commands) or i == len(navdata)):
             break
 
-    # 4] label kazde skupiny je nejcastejsi command v ni.
-    #    jako vstupni data beru sloupecky 11,12,13 (nultý je až ten po timestampu, tedy state. baterka je sloupec 1, atd).
-    #    Navdata agreguji tak, ze je v ramci skupiny vsechny zprumeruji.
-
     i = 0
     while i < len(labelled):
+        # label of the interval is to be the most common command in the interval
         labels = [
             select_label(list(map(lambda x: x[1], labelled[i].commands))),  # leftRight
             select_label(list(map(lambda x: x[2], labelled[i].commands))),  # frontBack
-            # select_label(list(map(lambda x: x[3], labelled[i].commands))),
+            # select_label(list(map(lambda x: x[3], labelled[i].commands))), # up - not used
             select_label(list(map(lambda x: x[4], labelled[i].commands))),  # angular
         ]
         labelled[i].most_common_commands = labels
 
+        # pick roll, pitch and yaw from navdata
         data = np.array(labelled[i].navdata)[:, 12:15]
-        # data=data.mean(axis=0)
         labelled[i].selected_navdata = data
         i += 1
 
-        dataColumnNamesRealImag = ['leftRight', 'frontBack', 'angular', 'Roll_Mean', 'Roll_SD', 'Roll_FFT_Mean_Real',
-                               'Roll_FFT_Mean_Imag',
-                               'Roll_FFT_SD', 'Pitch_Mean', 'Pitch_SD', 'Pitch_FFT_Mean_Real', 'Pitch_FFT_Mean_Imag',
-                               'Pitch_FFT_SD',
-                               'Yaw_Mean', 'Yaw_SD', 'Yaw_FFT_Mean_Real', 'Yaw_FFT_Mean_Imag', 'Yaw_FFT_SD']
+    # insert data into pandas DataFrame
+    dataColumnNamesRealImag = ['leftRight', 'frontBack', 'angular', 'Roll_Mean', 'Roll_SD', 'Roll_FFT_Mean_Real',
+                           'Roll_FFT_Mean_Imag',
+                           'Roll_FFT_SD', 'Pitch_Mean', 'Pitch_SD', 'Pitch_FFT_Mean_Real', 'Pitch_FFT_Mean_Imag',
+                           'Pitch_FFT_SD',
+                           'Yaw_Mean', 'Yaw_SD', 'Yaw_FFT_Mean_Real', 'Yaw_FFT_Mean_Imag', 'Yaw_FFT_SD']
 
-
+    # determine the shape of DataFrame
     numRecords = len(labelled)
     ind = list()
     for k in range(0, numRecords):
@@ -108,25 +148,31 @@ def PrepareData(cmdFileName, navdataFileName):
     pprint(ind)
     dataMatrix = pd.DataFrame(columns=dataColumnNamesRealImag, index=ind)
 
+    # to make a code more readable
     navdataTranslate = {'Pitch': 0, 'Roll': 1, 'Yaw': 2}
     cmdTranslate = {'leftRight': 0, 'frontBack': 1, 'angular': 2}
 
+    # fill DataFrame with data, use mean, std, mean and std of fft on roll, pitch, yaw columns
     index = 0
     for timeFrame in labelled:
+        # labels
         dataMatrix.leftRight[index] = float(timeFrame.most_common_commands[cmdTranslate['leftRight']])
         dataMatrix.frontBack[index] = float(timeFrame.most_common_commands[cmdTranslate['frontBack']])
         dataMatrix.angular[index] = float(timeFrame.most_common_commands[cmdTranslate['angular']])
 
+        # means
         means = timeFrame.selected_navdata.mean(axis=0)
         dataMatrix.Roll_Mean[index] = means[navdataTranslate['Roll']]
         dataMatrix.Pitch_Mean[index] = means[navdataTranslate['Pitch']]
         dataMatrix.Yaw_Mean[index] = means[navdataTranslate['Yaw']]
 
+        # stds
         stds = timeFrame.selected_navdata.std(axis=0)
         dataMatrix.Roll_SD[index] = stds[navdataTranslate['Roll']]
         dataMatrix.Pitch_SD[index] = stds[navdataTranslate['Pitch']]
         dataMatrix.Yaw_SD[index] = stds[navdataTranslate['Yaw']]
-        
+
+        # roll FFT
         rollFFT = np.fft.fft(timeFrame.selected_navdata[:, navdataTranslate['Roll']])
         rollFFtmean = np.mean(rollFFT)
         dataMatrix.Roll_FFT_Mean_Real[index] = rollFFtmean.real
@@ -134,6 +180,7 @@ def PrepareData(cmdFileName, navdataFileName):
         rollFFTstd = np.std(rollFFT)
         dataMatrix.Roll_FFT_SD[index] = rollFFTstd
 
+        # pitch FFT
         pitchFFT = np.fft.fft(timeFrame.selected_navdata[:, navdataTranslate['Pitch']])
         pitchFFtmean = np.mean(pitchFFT)
         dataMatrix.Pitch_FFT_Mean_Real[index] = pitchFFtmean.real
@@ -141,6 +188,7 @@ def PrepareData(cmdFileName, navdataFileName):
         pitchFFTstd = np.std(pitchFFT)
         dataMatrix.Pitch_FFT_SD[index] = pitchFFTstd
 
+        # yaw FFT
         yawFFT = np.fft.fft(timeFrame.selected_navdata[:, navdataTranslate['Yaw']])
         yawFFtmean = np.mean(yawFFT)
         dataMatrix.Yaw_FFT_Mean_Real[index] = yawFFtmean.real
@@ -150,6 +198,7 @@ def PrepareData(cmdFileName, navdataFileName):
 
         index += 1
 
+    # make commands discrete
     newDataMatrix = dataMatrix
     for i in ind:
         MakeCMDsDiscreteWithFrozenDict(i, dataMatrix, newDataMatrix)
@@ -232,74 +281,3 @@ print('angular')
 print(disp.confusion_matrix)
 plt.show()
 plt.close()
-
-
-
-
-'''
-random.seed(33) #does not seem to work reliably.
-random.shuffle(labelled) #train/test split
-
-predicted_variable=1 #which of the labels should be predicted?
-
-convert_label ={"-0.25":0, "0.0":1,"0.25":2}
-labels = np.array(list(map(lambda x:convert_label[ x.most_common_commands[predicted_variable]], labelled)))
-
-data  =np.array(list(map(lambda x: x.aggregated_navdata, labelled)))
-selected_columns=np.array([11,12,13],dtype=np.int32)
-
-data_train=data[:100,  selected_columns]
-data_test =data[ 100:, selected_columns]
-
-labels_train=labels[:100]
-labels_test =labels[ 100:]
-
-
-tree=sklearn.tree.DecisionTreeClassifier()
-tree=tree.fit(data_train,labels_train)
-predicted=tree.predict(data_test)
-confussion_matrix=np.zeros([3,3])
-
-for i in range(0,predicted.shape[0]):
-    confussion_matrix[labels_test[i]][predicted[i]]+=1
-
-print(confussion_matrix)
-'''
-
-'''
-disp = plot_confusion_matrix(tree, data_test, labels_test,
-                             display_labels=[*frozenCmds.values()],
-                             cmap=plt.cm.Blues,
-                             normalize=None)
-disp.ax_.set_title("super cm")
-print('super cm')
-print(disp.confusion_matrix)
-plt.show()
-plt.close()
-'''
-
-
-#Confussion matrices:
-#Row: true label, Column: predicted label
-#(one of the achieved results. seed does not seem to work properly,
-#so another run will likely give different results)
-
-#predicted_variable=0
-#[[ 1.  0.  0.]
-# [ 0. 57.  0.]
-# [ 0.  0.  0.]]
-#
-#predicted_variable=1
-#[[15.  1.  3.]
-# [ 1. 15.  1.]
-# [ 3.  2. 17.]]
-#
-#predicted_variable=2
-#[[ 2.  1.  0.]
-# [ 2. 53.  0.]
-# [ 0.  0.  0.]]
-#
-#predicted_variable=3
-#[[ 0.  0.  0.]
-# [ 0. 45.  2.]
-# [ 0.  0. 11.]]
