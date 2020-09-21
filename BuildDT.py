@@ -3,12 +3,18 @@ import numpy as np
 import graphviz
 from CreateDataMatrix import dataForDTRealImagFrozenDict
 from CreateDataMatrix import dataDTSecondSet
+from CreateDataMatrix import optimalLenghtDataFrontBack
+from CreateDataMatrix import optimalLengthDataAngularLeftRight
 from CreateDataMatrix import Cmd
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import GridSearchCV
 from sklearn.preprocessing import StandardScaler
+from CreateDataMatrix import dataDTchanged, dataForCMchanged, dataForCM
+from sklearn.metrics import plot_confusion_matrix
+import matplotlib.pyplot as plt
+from CreateDataMatrix import frozenCmds
 
 # this modul tunes hyperparameters for a decision tree and subsequently builds DT with the best hyperparameters found
 # methods from this modul require dataMatrices created by some methods from CreateDataMatrixForDT modul
@@ -36,7 +42,7 @@ def GetFeatures(dataMatrix):
     features = dataMatrix.drop(['leftRight', 'frontBack', 'angular'], axis=1)
     return features
 
-def CrossValidation(pipeline, params_to_try, x_train, y_train, x_test, y_test):
+def CrossValidation(pipeline, params_to_try, x_train, y_train, x_test, y_test, labelColumn):
     '''
     tries 3,4 and 5 cross validation of decision tree
     returns parameters of decision tree with the best score
@@ -55,6 +61,14 @@ def CrossValidation(pipeline, params_to_try, x_train, y_train, x_test, y_test):
         # try all possible combinations of params_to_try
         create_grid = GridSearchCV(pipeline, param_grid=params_to_try, cv=cv)
         create_grid.fit(x_train, y_train)
+        """
+        disp = plot_confusion_matrix(create_grid, x_test, y_test,
+                                     display_labels=[*frozenCmds.values()],
+                                     cmap=plt.cm.Blues,
+                                     normalize=None)
+        #print(disp.confusion_matrix)
+        # plt.show()
+        """
         newScore = create_grid.score(x_test, y_test)
         print("score for %d fold cross validation is %3.2f" % (cv, newScore))
         print("best fit params:")
@@ -91,7 +105,9 @@ def BuildDT(labelColumn, dataMatrix):
 
     # DT attributes I wanna estimate
     params_to_try = {'decisionTree__criterion': ['gini', 'entropy'],
-                     'decisionTree__max_depth': np.arange(3, 15)}
+                     'decisionTree__max_depth': np.arange(3, 15),
+                     'decisionTree__class_weight': ['balanced']}
+
     # np.arange(3, 15): totally random estimation of max tree depth taken from a tutorial. I have no clue whether it
     # makes sense in this case!!
 
@@ -101,7 +117,7 @@ def BuildDT(labelColumn, dataMatrix):
     print("num of test samples: ", len(y_test))
 
     # estimate the best params for DT
-    bestParams = CrossValidation(pipeline, params_to_try, x_train, y_train, x_test, y_test)
+    bestParams = CrossValidation(pipeline, params_to_try, x_train, y_train, x_test, y_test, labelColumn)
 
     # build DT
     decisionTree = DecisionTreeClassifier(criterion=bestParams['DT_criterion'], max_depth=bestParams['DT_maxDepth'])
@@ -136,26 +152,49 @@ def GraphTree(decisionTree, features, pngFileName):
     graph.write_png('OutputStages\\Graphs\\%s' %pngFileName)
     Image(graph.create_png())
 
-if __name__ == "__main__":
-    dataForDT = dataForDTRealImagFrozenDict
 
-    # build and graph decision trees
-    features = GetFeatures(dataForDT)
-    DTleftRight, x_trainLR, y_trainLR, x_testLR, y_testLR = BuildDT('leftRight', dataForDT)
-    GraphTree(DTleftRight, features, 'leftRightDT.png')
-    DTfrontBack, x_trainFB, y_trainFB, x_testFB, y_testFB = BuildDT('frontBack', dataForDT)
-    GraphTree(DTfrontBack, features, 'frontBackDT.png')
-    DTangular, x_trainA, y_trainA, x_testA, y_testA = BuildDT('angular', dataForDT)
-    GraphTree(DTangular, features, 'angularDT.png')
+dataForDT = dataForDTRealImagFrozenDict
 
-    # build and graph decision trees based on the second data set
-    featuresSecond = GetFeatures(dataDTSecondSet)
-    DTleftRightSecond, x_trainLRSecond, y_trainLRSecond, x_testLRSecond, y_testLRSecond = BuildDT('leftRight', dataDTSecondSet)
-    GraphTree(DTleftRightSecond, featuresSecond, 'leftRightDTSecond.png')
-    DTfrontBackSecond, x_trainFBSecond, y_trainFBSecond, x_testFBSecond, y_testFBSecond = BuildDT('frontBack', dataDTSecondSet)
-    GraphTree(DTfrontBackSecond, featuresSecond, 'frontBackDTSecond.png')
-    DTangularSecond, x_trainASecond, y_trainASecond, x_testASecond, y_testASecond = BuildDT('angular', dataDTSecondSet)
-    GraphTree(DTangularSecond, featuresSecond, 'angularDTSecond.png')
+# build DT
+decisionTree = DecisionTreeClassifier(criterion='gini', max_depth=4, class_weight='balanced')
+features = GetFeatures(dataDTchanged)
+labels = GetLabel('leftRight', dataDTchanged)
+decisionTree.fit(features, labels)
+
+DTleftRightCM, x_trainLR, y_trainLR, x_testLR, y_testLR = BuildDT('leftRight',dataForCM)
+DTfrontBackCM, x_trainLR, y_trainLR, x_testLR, y_testLR = BuildDT('frontBack', dataForCM)
+DTangularCM, x_trainLR, y_trainLR, x_testLR, y_testLR = BuildDT('angular', dataForCM)
+
+
+DTleftRightchanged, x_trainLR, y_trainLR, x_testLR, y_testLR = BuildDT('leftRight', dataDTchanged)
+DTfrontBackchanged, x_trainLR, y_trainLR, x_testLR, y_testLR = BuildDT('frontBack', dataDTchanged)
+DTangularchanged, x_trainLR, y_trainLR, x_testLR, y_testLR = BuildDT('angular', dataDTchanged)
+#print(DTangularOptimalLen.score(x_testA,y_testA))
+
+# build and graph decision trees
+features = GetFeatures(dataForDT)
+DTleftRight, x_trainLR, y_trainLR, x_testLR, y_testLR = BuildDT('leftRight', dataForDT)
+GraphTree(DTleftRight, features, 'leftRightDT.png')
+DTfrontBack, x_trainFB, y_trainFB, x_testFB, y_testFB = BuildDT('frontBack', dataForDT)
+GraphTree(DTfrontBack, features, 'frontBackDT.png')
+DTangular, x_trainA, y_trainA, x_testA, y_testA = BuildDT('angular', dataForDT)
+GraphTree(DTangular, features, 'angularDT.png')
+
+# build and graph decision trees based on the second data set
+featuresSecond = GetFeatures(dataDTSecondSet)
+DTleftRightSecond, x_trainLRSecond, y_trainLRSecond, x_testLRSecond, y_testLRSecond = BuildDT('leftRight', dataDTSecondSet)
+GraphTree(DTleftRightSecond, featuresSecond, 'leftRightDTSecond.png')
+DTfrontBackSecond, x_trainFBSecond, y_trainFBSecond, x_testFBSecond, y_testFBSecond = BuildDT('frontBack', dataDTSecondSet)
+GraphTree(DTfrontBackSecond, featuresSecond, 'frontBackDTSecond.png')
+DTangularSecond, x_trainASecond, y_trainASecond, x_testASecond, y_testASecond = BuildDT('angular', dataDTSecondSet)
+GraphTree(DTangularSecond, featuresSecond, 'angularDTSecond.png')
+
+# build and graph decision trees
+DTleftRightOptimalLen, x_trainLR, y_trainLR, x_testLR, y_testLR = BuildDT('leftRight', optimalLengthDataAngularLeftRight)
+DTfrontBackOptimalLen, x_trainFB, y_trainFB, x_testFB, y_testFB = BuildDT('frontBack', optimalLenghtDataFrontBack)
+DTangularOptimalLen, x_trainA, y_trainA, x_testA, y_testA = BuildDT('angular', optimalLengthDataAngularLeftRight)
+print(DTangularOptimalLen.score(x_testA,y_testA))
+
 
 
 
