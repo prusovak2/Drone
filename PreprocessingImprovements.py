@@ -4,7 +4,7 @@ from BuildDT import GetFeatures, GetLabel
 from CreateDataMatrix import dataForDTRealImagFrozenDict as dataForModel
 from BuildRandomForest import GetLabelAndFeatureData
 from CreateDataMatrix import dataForCM
-from CreateDataMatrix import CreateDataFrameForDTMatrixShift, merged
+from CreateDataMatrix import CreateDataFrameForDTMatrixShift, merged, mergedCM
 from SupportVectorMachines import TuneParamsForSVM
 import matplotlib.pyplot as plt
 from pprint import pprint
@@ -56,7 +56,9 @@ def EvaluateModels(labelColumnName, dataForModel, dataForCM, CMColor, specificat
 	# tune param and build decision tree
 	decisionTree, x_train, y_train, x_test, y_test = BuildDT(labelColumnName, dataForModel)
 	# crete confusion matrix for the decision tree
+	pprint(dataForCM)
 	CreateConfusionMatrix(labelColumnName, dataForCM, decisionTree, "decisionTreeCM " + labelColumnName, CMColor,showCM=showCM)
+	pprint(dataForCM)
 	# evaluate how well decision tree performs on test data
 	DTscore = ScoreModel(labelColumnName, decisionTree, dataForCM)
 	print(specification)
@@ -74,7 +76,7 @@ def EvaluateModels(labelColumnName, dataForModel, dataForCM, CMColor, specificat
 	outputFile.write(specification + labelColumnName +'\n')
 	outputFile.write('decision tree score is %3.2f\n' % DTscore)
 	outputFile.write('SVM score is %3.2f\n' % SVMScore)
-	return DTscore, SVMScore
+	return DTscore, SVMScore, scaler, decisionTree, svm
 
 
 def deleteContent(fName):
@@ -346,12 +348,91 @@ def TryIntervalLensForAllLabels(mergedData, outputFileName, shift=0, lowerIntear
 		pprint(bestDTintervalLen, stream=outputFile)
 
 
+def TryIntervalLenAnDShiftOneLabel(labelColumnName, mergedData, mergedDataCM, outputFileName, lowerIntearvalLenBorder=20, upperIntervalLenBorder=40):
+	"""
+
+	"""
+	with open(outputFileName, "w") as outputFile:
+		DTbestScore = 0
+		DTbestShift = None
+		DTbestIntervalLen = None
+		SVMbestScore = 0
+		SVMbestShift = None
+		SVMbestIntervalLen = None
+		SVMScaler = None
+		bestDecisionTree = None
+		bestSVM = None
+		DTbestDataMatrixCM = None
+		SVMBestDataMatrixCM = None
+
+		lowerShiftBorder = 0
+		for intervalLen in range(lowerIntearvalLenBorder, upperIntervalLenBorder + 1):
+			upperShiftBorder = upperIntervalLenBorder//2
+			for shift in range(lowerShiftBorder, upperShiftBorder):
+				# data preprocessing
+				dataMatrix = CreateDataFrameForDTMatrixShift(inputDFmerged=mergedData, intervalLen=intervalLen,
+														  representantSampleShift=shift)
+				dataMatrixCM = CreateDataFrameForDTMatrixShift(inputDFmerged=mergedDataCM, intervalLen=intervalLen,
+															   representantSampleShift=shift)
+				DTscore, SVMscore, SVMscaler, decisionTree, SVM = EvaluateModels(labelColumnName, dataMatrix, dataMatrixCM, plt.cm.Blues,
+														" IntervalLen: " + str(intervalLen) + " representant sample " + str(
+														shift) + " ", outputFile, showCM=False)
+				# remember the best result so far
+				if DTscore > DTbestScore:
+					DTbestScore= DTscore
+					DTbestIntervalLen = intervalLen
+					DTbestShift = shift
+					bestDecisionTree = decisionTree
+					DTbestDataMatrixCM = dataMatrixCM
+				if SVMscore > SVMbestScore:
+					SVMbestScore = SVMscore
+					SVMbestIntervalLen = intervalLen
+					SVMbestShift = shift
+					bestSVM= SVM
+					SVMBestDataMatrixCM = dataMatrixCM
+
+		print('bestDTscores:')
+		print(DTbestScore)
+		print('bestDTintervalLen:')
+		print(DTbestIntervalLen)
+		print('DTbestShift:')
+		print(DTbestShift)
+
+		print('bestSVMscores:')
+		print(SVMbestScore)
+		print('bestSVMintervalLen:')
+		print(SVMbestIntervalLen)
+		print('bestSVMShift:')
+		print(SVMbestShift)
+
+		outputFile.write('bestDTscores:\n')
+		pprint(DTbestScore, stream=outputFile)
+		outputFile.write('bestDTintervalLen:\n')
+		pprint(DTbestIntervalLen, stream=outputFile)
+		outputFile.write('bestDTshift:\n')
+		pprint(DTbestShift, stream=outputFile)
+
+		outputFile.write('bestSVMscores:\n')
+		pprint(SVMbestScore, stream=outputFile)
+		outputFile.write('bestSVMintervalLen:\n')
+		pprint(SVMbestIntervalLen, stream=outputFile)
+		outputFile.write('bestSVMshift:\n')
+		pprint(SVMbestShift, stream=outputFile)
+
+		CreateConfusionMatrix(labelColumnName, DTbestDataMatrixCM, bestDecisionTree,'bestDT', plt.cm.Blues)
+		CreateConfusionMatrix(labelColumnName, SVMBestDataMatrixCM, bestSVM, 'bestSVM', plt.cm.Blues)
+
+		return DTbestIntervalLen, DTbestShift, SVMbestIntervalLen, SVMbestShift
+
+
 if __name__ == "__main__":
+	# TODO: run and repair all methods, ret val of EvaluateModel changed
 	# TryShiftsForOneLabel('leftRight', merged, 'OutputStages\\scoresShiftLeftRight.txt')
 	# TryShiftsForOneLabel('frontBack', merged, 'OutputStages\\scoresShiftFrontBack.txt')
 	# TryShiftsForOneLabel('angular', merged, 'OutputStages\\scoresShiftAngular.txt')
 
-	TryShiftsForAllLabels(merged, 'OutputStages\\scoresShiftAllLabels.txt')
+	#TryShiftsForAllLabels(merged, 'OutputStages\\scoresShiftAllLabels.txt')
 
 	#TryIntervalLenghtsOneLabel('leftRight', merged, 'OutputStages\\scoresIntervalLenLeftRight.txt')
-	TryIntervalLensForAllLabels(merged, 'OutputStages\\scoresIntervalLenghtsAllLabels.txt')
+	#TryIntervalLensForAllLabels(merged, 'OutputStages\\scoresIntervalLenghtsAllLabels.txt')
+	TryIntervalLenAnDShiftOneLabel('leftRight', merged, mergedCM, 'OutputStages\\leftRightShiftAndLen.txt')
