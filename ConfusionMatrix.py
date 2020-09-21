@@ -11,7 +11,7 @@ from CreateDataMatrix import dataDTSecondCM, dataForCMchanged, dataDTchanged, da
 from BuildDT import DTleftRight
 
 
-def CreateConfusionMatrix(labelColumnName, validationDataMatrix, MLmodel, cmTitle, color, scaler=None, showCM=True):
+def CreateConfusionMatrix(labelColumnName, validationDataMatrix, MLmodel, cmTitle, color, scaler=None, showCM=True, time=True):
     '''
     for given MLmodel creates a confusion matrix showing how well the model performs while predicting
     labels from validationDataMatrix model was not trained on
@@ -24,7 +24,7 @@ def CreateConfusionMatrix(labelColumnName, validationDataMatrix, MLmodel, cmTitl
     :param showCM: should CM be shown?
     :return: features of validation data, standardized when scaler is not None
     '''
-    realLabels = bdt.GetLabel(labelColumnName, validationDataMatrix)
+    realLabels = bdt.GetLabel(labelColumnName, validationDataMatrix, time)
     features = bdt.GetFeatures(validationDataMatrix)
     if scaler is not None:
         # standardize validation data by same scaler that was used for a training data

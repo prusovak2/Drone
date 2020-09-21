@@ -295,7 +295,6 @@ def CreateDataFrameForDTMatrix(inputDFmerged, ColumnNames, functionToCreateConte
     :param intervalLen:
     :return: dataFrame to base decision tree on
     '''
-    inputDFmerged.to_csv('OutputStages\\BEFORERESETINDEX.tsv', sep='\t')
     intIndexed = inputDFmerged.reset_index()
     newDF = CreateEmptyDataFrame(intervalLen, intIndexed, ColumnNames)
 

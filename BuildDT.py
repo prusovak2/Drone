@@ -19,7 +19,7 @@ from CreateDataMatrix import frozenCmds
 # this modul tunes hyperparameters for a decision tree and subsequently builds DT with the best hyperparameters found
 # methods from this modul require dataMatrices created by some methods from CreateDataMatrixForDT modul
 
-def GetLabel(labelColumn, dataMatrix):
+def GetLabel(labelColumn, dataMatrix, time=True):
     '''
     separates a column to be predicted
     :param labelColumn:
@@ -27,8 +27,9 @@ def GetLabel(labelColumn, dataMatrix):
     :return: selected label column
     '''
     labels = dataMatrix[[labelColumn]]
-    labels = labels.reset_index()
-    labels = labels.drop(['time'], axis=1)
+    if time is True:
+        labels = labels.reset_index()
+        labels = labels.drop(['time'], axis=1)
     # print(labels)
     # print(labels.describe())
     return labels
@@ -81,7 +82,7 @@ def CrossValidation(pipeline, params_to_try, x_train, y_train, x_test, y_test, l
     return {'DT_criterion': DT_criterion, 'DT_maxDepth': DT_maxDepth}
 
 
-def BuildDT(labelColumn, dataMatrix):
+def BuildDT(labelColumn, dataMatrix, time=True):
     '''
     for a given label column tries to determine the best decision tree parameters via 3,4 and 5 cross validation
     then builds a decision tree with the best parameters found
@@ -92,7 +93,7 @@ def BuildDT(labelColumn, dataMatrix):
     :return: decision tree, train_Features, train_Labels, test_Features, test_Labels
     '''
     # split what I want to predict from what I want to base a prediction on
-    labels = GetLabel(labelColumn, dataMatrix)
+    labels = GetLabel(labelColumn, dataMatrix, time)
     features = GetFeatures(dataMatrix)
 
     # prepare pipeline, that carries out a data standartization - to make a features have a variance in a same order
@@ -121,7 +122,7 @@ def BuildDT(labelColumn, dataMatrix):
 
     # build DT
     decisionTree = DecisionTreeClassifier(criterion=bestParams['DT_criterion'], max_depth=bestParams['DT_maxDepth'])
-    decisionTree.fit(x_train, y_train)
+    decisionTree.fit(features, labels)
 
     return decisionTree, x_train, y_train, x_test, y_test
 

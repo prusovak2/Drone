@@ -18,7 +18,7 @@ from BuildDT import GetFeatures
 
 # this modul tunes hyperparameters for SVM and subsequently creates SVM classifier with the best hyperparamaters found
 
-def TuneParamsForSVM(labelColoumnName, dataForSVM):
+def TuneParamsForSVM(labelColoumnName, dataForSVM, time=True):
 	"""
 	tunes hyperparameters for support vector machine using 3,4 and 5 cross validation
 	:param labelColoumnName:
@@ -26,7 +26,7 @@ def TuneParamsForSVM(labelColoumnName, dataForSVM):
 	:return: SVM classifier with the best hyperparameter combination found
 	"""
 	# get labels and features
-	labels = GetLabel(labelColoumnName, dataForSVM)
+	labels = GetLabel(labelColoumnName, dataForSVM, time)
 	features = GetFeatures(dataForSVM)
 	# create basic SVM classifier
 	svm_classifier = svm.SVC()
